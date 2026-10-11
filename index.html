@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AIMathQuest</title>
-  <!-- Google 官方登入套件 -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <!-- 煙花粒子庫 -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
   <style>
     :root {
@@ -33,15 +31,26 @@
 
     body {
       background: var(--bg-page);
-      background-image: 
-        radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.05) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(2, 132, 199, 0.06) 0%, transparent 40%);
       min-height: 100vh;
       color: var(--text-main);
       position: relative;
+      overflow-x: hidden;
+    }
+
+    /* HTML5 Canvas 動態粒子背景 */
+    #ambientCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
     }
 
     .app-container {
+      position: relative;
+      z-index: 1;
       max-width: 840px;
       margin: 24px auto;
       padding: 0 16px 80px 16px;
@@ -77,44 +86,38 @@
     .hud-pill {
       display: inline-flex;
       align-items: center;
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(8px);
       border: 1.5px solid #cbd5e1;
       padding: 6px 14px;
-      border-radius: 999px;
-      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.05);
-      gap: 10px;
+      border-radius: 18px;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+      gap: 12px;
+      max-width: 100%;
     }
 
-    .hud-btn-edit {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: var(--primary);
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      font-size: 0.9rem;
-      transition: all 0.2s;
-    }
-    .hud-btn-edit:hover {
-      background: var(--primary);
-      color: #ffffff;
-      transform: scale(1.1);
-    }
-
+    /* 頭像圓形容器，防擠壓 */
     .hud-avatar-slot {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+      aspect-ratio: 1 / 1;
+      flex-shrink: 0;
       border-radius: 50%;
       background: #e2e8f0;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      border: 1.5px solid #94a3b8;
+      border: 2px solid var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s;
+    }
+    .hud-avatar-slot:hover {
+      transform: scale(1.12);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25);
     }
     .hud-avatar-slot img {
       width: 100%;
@@ -122,22 +125,40 @@
       object-fit: cover;
     }
 
+    /* 暱稱與成就圖案合併容器 */
+    .hud-name-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
     .hud-nickname {
       font-weight: 800;
       color: #0f172a;
       font-size: 0.98rem;
     }
+    .hud-achievement-inline {
+      font-size: 1.1rem;
+      line-height: 1;
+    }
 
     .hud-badge-slot {
       font-size: 0.78rem;
       font-weight: 800;
-      padding: 3px 8px;
+      padding: 4px 8px;
       border-radius: 6px;
       border: 1px dashed;
     }
     .hud-level { background: #fef3c7; color: #b45309; border-color: #fcd34d; }
-    .hud-achieve { background: #f3e8ff; color: #7e22ce; border-color: #d8b4fe; }
-    .hud-title { background: #e0f2fe; color: #0369a1; border-color: #7dd3fc; }
+
+    /* 稱號支援 CHAR(10) 自動換行 */
+    .hud-title {
+      background: #e0f2fe;
+      color: #0369a1;
+      border-color: #7dd3fc;
+      white-space: pre-line;
+      line-height: 1.25;
+      text-align: left;
+    }
 
     .campus-card {
       background: var(--card-bg);
@@ -503,29 +524,13 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    #violationToast {
-      display: none;
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(239, 68, 68, 0.95);
-      color: #ffffff;
-      padding: 12px 24px;
-      border-radius: 999px;
-      font-weight: 800;
-      font-size: 0.95rem;
-      box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4);
-      z-index: 10000;
-    }
-
-    /* ================= 暱稱與 5x4 頭像設定彈窗 ================= */
+    /* 通用 Modal 遮罩層 */
     .modal-overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(5px);
+      background: rgba(15, 23, 42, 0.78);
+      backdrop-filter: blur(6px);
       z-index: 99999;
       align-items: center;
       justify-content: center;
@@ -538,7 +543,7 @@
       max-width: 540px;
       width: 100%;
       padding: 28px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
       animation: modalSlide 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
@@ -547,7 +552,7 @@
       to { transform: scale(1) translateY(0); opacity: 1; }
     }
 
-    /* 5x4 頭像網格 */
+    /* 5x4 頭像矩陣網格 */
     .avatar-matrix-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
@@ -569,19 +574,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      position: relative;
       transition: all 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
-
-    /* 懸停微微放大 */
     .avatar-matrix-item:hover {
       transform: scale(1.1);
       border-color: #93c5fd;
       box-shadow: 0 6px 14px rgba(37, 99, 235, 0.15);
       z-index: 2;
     }
-
-    /* 點選點亮效果 */
     .avatar-matrix-item.selected {
       border-color: var(--primary);
       transform: scale(1.06);
@@ -589,7 +589,6 @@
       outline: 2px solid var(--primary);
       background: #eff6ff;
     }
-
     .avatar-matrix-item img {
       width: 100%;
       height: 100%;
@@ -599,8 +598,24 @@
 </head>
 <body>
 
-  <!-- 異常提醒 Toast -->
-  <div id="violationToast">⚠️ 警告：偵測到跳出作答畫面！此操作已記錄。</div>
+  <!-- HTML5 Canvas 背景引擎 -->
+  <canvas id="ambientCanvas"></canvas>
+
+  <!-- 作弊警告中斷 Modal (強制按「知道」解除) -->
+  <div id="violationModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 440px; text-align: center; border-top: 6px solid var(--danger);">
+      <div style="font-size: 3.2rem; margin-bottom: 8px;">🚨</div>
+      <h3 style="font-size: 1.35rem; font-weight: 800; color: #b91c1c; margin-bottom: 10px;">
+        考場紀律異常警告！
+      </h3>
+      <div id="violationModalMsg" style="color: #475569; font-size: 0.95rem; line-height: 1.6; margin-bottom: 22px; text-align: left; background: #fef2f2; padding: 14px 16px; border-radius: 12px; border: 1px solid #fecaca;">
+        偵測到跳出測驗頁面！
+      </div>
+      <button class="btn-campus" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);" onclick="dismissViolationModal()">
+        我知道已被記錄在考室記錄當中，立即返回作答
+      </button>
+    </div>
+  </div>
 
   <!-- 暱稱與頭像設定 Modal -->
   <div id="profileModal" class="modal-overlay">
@@ -618,10 +633,8 @@
       </div>
 
       <div class="form-group" style="margin-bottom: 0;">
-        <label class="form-label">🎭 選擇頭像樣式 (5×4 矩陣點選)</label>
-        <div id="avatarMatrixContainer" class="avatar-matrix-grid">
-          <!-- 動態載入 20 個頭像 -->
-        </div>
+        <label class="form-label">🎭 點選更換頭像樣式 (5×4 矩陣)</label>
+        <div id="avatarMatrixContainer" class="avatar-matrix-grid"></div>
       </div>
 
       <div style="display: flex; gap: 12px;">
@@ -634,7 +647,7 @@
   <div class="app-container">
     <div class="header-area">
       <h1 class="brand-title">AIMathQuest</h1>
-      <p class="brand-subtitle">自主學習・即時回應・遊戲互動</p>
+      <p class="brand-subtitle">自主學習・即時回饋・遊戲互動</p>
     </div>
 
     <!-- 步驟 0：登入驗證區塊 -->
@@ -665,29 +678,28 @@
 
     <!-- 步驟 1：客製設定介面 -->
     <div id="setupView" class="campus-card" style="display: none;">
-      <!-- 頂部自訂暱稱與完整 HUD 列 -->
+      <!-- 頂部自訂暱稱與 HUD 列 (無筆按鈕，頭像支援點擊) -->
       <div class="user-hud-bar">
         <div class="hud-pill">
-          <!-- 1. 編輯按鈕 -->
-          <button class="hud-btn-edit" onclick="openProfileModal(false)" title="修改暱稱與頭像" style="display: none;">✏️</button>
-          <!-- 2. 頭像槽 (點選也可開啟更換) -->
-          <div class="hud-avatar-slot" onclick="openProfileModal(false)" style="cursor: pointer;" title="更換頭像">
+          <!-- 1. 頭像槽 (點擊直接更換頭像與暱稱) -->
+          <div class="hud-avatar-slot" onclick="openProfileModal(false)" title="點選更換頭像與暱稱">
             <img id="hudAvatarImg" src="" alt="Avatar">
           </div>
-          <!-- 3. 暱稱 -->
-          <span id="hudNickname" class="hud-nickname">載入中...</span>
-          <!-- 4. 等級 -->
+          <!-- 2. 暱稱與成就圖案直接合併 -->
+          <div class="hud-name-wrapper">
+            <span id="hudNickname" class="hud-nickname">載入中...</span>
+            <span id="hudAchievement" class="hud-achievement-inline"></span>
+          </div>
+          <!-- 3. 等級 -->
           <span id="hudLevel" class="hud-badge-slot hud-level"></span>
-          <!-- 5. 成就圖案 -->
-          <span id="hudAchievement" class="hud-badge-slot hud-achieve"></span>
-          <!-- 6. 稱號 -->
+          <!-- 4. 稱號 (支援 CHAR(10) 自動換行) -->
           <span id="hudTitle" class="hud-badge-slot hud-title"></span>
         </div>
       </div>
 
       <div class="form-group">
         <label class="form-label">🏫 目前模式</label>
-        <input type="text" id="examRoomInput" class="input-text" placeholder="例如：第一段S1A數學AI測評1" value="日常練習" readonly>
+        <input type="text" id="examRoomInput" class="input-text" value="日常練習" readonly>
       </div>
 
       <div class="form-group">
@@ -710,7 +722,7 @@
       <button id="btnStart" class="btn-campus" onclick="handleStartQuiz()">🚀 隨機生成練習</button>
     </div>
 
-    <!-- 步驟 2：作答頁面 (含置頂動能進度條) -->
+    <!-- 步驟 2：作答頁面 (置頂藍色動態進度條) -->
     <div id="quizView" style="display: none;">
       <div class="sticky-progress-container">
         <div class="progress-info">
@@ -756,7 +768,7 @@
       </div>
 
       <div style="margin-top: 26px;">
-        <button class="btn-campus" onclick="handleResetToSetup()">🔄 再次測試 (返回自定義設置)</button>
+        <button class="btn-campus" onclick="handleResetToSetup()">🔄 返回自定義練習設置</button>
       </div>
     </div>
   </div>
@@ -768,7 +780,7 @@
   </div>
 
   <script>
-    // ⚠️ 替換為您的 GAS 部署網址
+    // ⚠️ 請修改為您的 GAS 部署網址
     const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzeCbqDf1f9qSznpTax3LfViPqESYe6Pcck1-wYtve0RbtGTBxlLPl46Qh0dSP9ANsw/exec';
 
     let userAuthToken = '';
@@ -779,9 +791,11 @@
     let currentQuizData = [];
     const userAnswers = {};
 
+    // 作弊中斷控制
     let violationCount = 0;
     const violationLogs = [];
     let isQuizActive = false;
+    let isViolationModalOpen = false;
 
     const GROUP_DEFINITIONS = [
       {
@@ -804,6 +818,90 @@
       }
     ];
 
+    /* ================= 1. HTML5 Canvas 動態背景引擎 ================= */
+    (function initAmbientCanvas() {
+      const canvas = document.getElementById('ambientCanvas');
+      const ctx = canvas.getContext('2d');
+      let width, height;
+      let particles = [];
+      const mathSymbols = ['∑', 'π', '∞', '∫', 'λ', '√x', '≈', 'θ', 'f(x)'];
+
+      function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      class Particle {
+        constructor() {
+          this.reset();
+        }
+        reset() {
+          this.x = Math.random() * width;
+          this.y = Math.random() * height;
+          this.vx = (Math.random() - 0.5) * 0.45;
+          this.vy = (Math.random() - 0.5) * 0.45;
+          this.radius = Math.random() * 2 + 1;
+          this.isSymbol = Math.random() < 0.28;
+          this.symbol = mathSymbols[Math.floor(Math.random() * mathSymbols.length)];
+          this.opacity = Math.random() * 0.35 + 0.1;
+        }
+        update() {
+          this.x += this.vx;
+          this.y += this.vy;
+          if (this.x < 0 || this.x > width) this.vx *= -1;
+          if (this.y < 0 || this.y > height) this.vy *= -1;
+        }
+        draw() {
+          if (this.isSymbol) {
+            ctx.fillStyle = `rgba(37, 99, 235, ${this.opacity * 0.8})`;
+            ctx.font = '14px "Segoe UI", sans-serif';
+            ctx.fillText(this.symbol, this.x, this.y);
+          } else {
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(2, 132, 199, ${this.opacity})`;
+            ctx.fill();
+          }
+        }
+      }
+
+      for (let i = 0; i < 50; i++) {
+        particles.push(new Particle());
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, width, height);
+
+        // 連線效果
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 110) {
+              ctx.strokeStyle = `rgba(37, 99, 235, ${0.12 * (1 - dist / 110)})`;
+              ctx.lineWidth = 0.8;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        particles.forEach(p => {
+          p.update();
+          p.draw();
+        });
+
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
+
+    /* ================= 2. API 通訊與身份校驗 ================= */
     async function callGasApi(action, data = {}) {
       const response = await fetch(GAS_API_URL, {
         method: 'POST',
@@ -817,7 +915,6 @@
       return resJson;
     }
 
-    // Google 登入完成回調
     async function handleCredentialResponse(response) {
       userAuthToken = response.credential;
       showLoading(true, '🧙‍♂️ 登入驗證中...');
@@ -832,11 +929,10 @@
         document.getElementById('authView').style.display = 'none';
         document.getElementById('setupView').style.display = 'block';
 
-        // 渲染 HUD 數據
         updateHudUI(currentUserProfile);
         renderGroupedCategories(res.categories);
 
-        // 首次登入檢查：若暱稱為空，強制彈窗
+        // 首次登入強制設定
         if (currentUserProfile.isFirstTime || !currentUserProfile.nickname) {
           openProfileModal(true);
         }
@@ -847,19 +943,20 @@
       }
     }
 
-    // 更新頂部 HUD 資訊
     function updateHudUI(profile) {
-      document.getElementById('hudNickname').textContent = profile.nickname || '未命名';
-      document.getElementById('hudLevel').textContent = `LV.${profile.level}`;
-      document.getElementById('hudAchievement').textContent = profile.achievement;
-      document.getElementById('hudTitle').textContent = profile.title;
+      document.getElementById('hudNickname').textContent = profile.nickname || '未命名學者';
+      // 成就圖案直接合併於暱稱右側（無邊框、無背景）
+      document.getElementById('hudAchievement').textContent = profile.achievement || '🌱';
+      document.getElementById('hudLevel').textContent = profile.level || 'LV.1';
+      // 稱號支援 CHAR(10) 自動換行
+      document.getElementById('hudTitle').textContent = profile.title || '初級學者';
 
       if (profile.avatarBase64) {
         document.getElementById('hudAvatarImg').src = profile.avatarBase64;
       }
     }
 
-    // 開啟設定彈窗 (isMandatory: 是否強制設定)
+    /* ================= 3. 頭像與個人設定面板 ================= */
     function openProfileModal(isMandatory = false) {
       const modal = document.getElementById('profileModal');
       const cancelBtn = document.getElementById('btnCancelProfile');
@@ -887,7 +984,6 @@
       document.getElementById('profileModal').style.display = 'none';
     }
 
-    // 渲染 5x4 矩陣頭像
     function renderAvatarMatrix() {
       const container = document.getElementById('avatarMatrixContainer');
       container.innerHTML = '';
@@ -912,7 +1008,6 @@
       });
     }
 
-    // 儲存暱稱與頭像
     async function handleConfirmProfileSave() {
       const newNick = document.getElementById('inputModalNickname').value.trim();
       if (!newNick) {
@@ -921,7 +1016,7 @@
         return;
       }
 
-      showLoading(true, '💾 正在儲存個人檔案至試算表...');
+      showLoading(true, '💾 正在儲存個人檔案...');
       try {
         const res = await callGasApi('updateProfile', {
           nickname: newNick,
@@ -939,30 +1034,45 @@
       }
     }
 
-    // 違規監控
+    /* ================= 4. 防作弊監控與阻斷警告 ================= */
     document.addEventListener('visibilitychange', () => {
-      if (document.hidden && isQuizActive) {
-        recordViolation('切換分頁或最小化');
+      if (document.hidden && isQuizActive && !isViolationModalOpen) {
+        recordViolation('切換瀏覽器分頁或視窗最小化');
       }
     });
 
     window.addEventListener('blur', () => {
-      if (isQuizActive) {
+      if (isQuizActive && !isViolationModalOpen) {
         recordViolation('離開當前作答視窗');
       }
     });
 
     function recordViolation(reason) {
+      isViolationModalOpen = true;
       violationCount++;
       const timeStr = new Date().toLocaleTimeString();
       violationLogs.push(`[${timeStr}] ${reason}`);
-      
-      const toast = document.getElementById('violationToast');
-      toast.textContent = `⚠️ 警告：偵測到${reason}！(累計 ${violationCount} 次)`;
-      toast.style.display = 'block';
-      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+
+      const msgBox = document.getElementById('violationModalMsg');
+      msgBox.innerHTML = `
+        ⚠️ <b>異常操作：</b>${reason}<br>
+        ⚠️ <b>累計違規：</b>第 <b style="color:#b91c1c; font-size:1.15rem;">${violationCount}</b> 次<br>
+        <span style="font-size:0.85rem; color:#64748b; display:inline-block; margin-top:8px;">
+          請注意：所有切換或離開行為已同步記錄於後端考室記錄當中，嚴禁作弊！
+        </span>
+      `;
+
+      document.getElementById('violationModal').style.display = 'flex';
     }
 
+    function dismissViolationModal() {
+      document.getElementById('violationModal').style.display = 'none';
+      setTimeout(() => {
+        isViolationModalOpen = false;
+      }, 350);
+    }
+
+    /* ================= 5. 題庫選擇與測驗生成 ================= */
     window.addEventListener('DOMContentLoaded', () => {
       const slider = document.getElementById('countSlider');
       const sliderVal = document.getElementById('sliderValue');
@@ -970,7 +1080,7 @@
         sliderVal.textContent = e.target.value + ' 題';
       });
 
-      // 防 F12 與右鍵
+      // 禁用開發者工具快捷鍵與右鍵
       document.addEventListener('contextmenu', e => e.preventDefault());
       document.addEventListener('keydown', e => {
         if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
@@ -1083,16 +1193,18 @@
       }
 
       const totalCount = parseInt(document.getElementById('countSlider').value, 10);
-      showLoading(true, '⚡ 正在為您智慧配置題目中...');
+      showLoading(true, '⚡ 正在為您配置題目中...');
 
       try {
         const res = await callGasApi('generateQuiz', { selectedCategories: selectedCats, totalCount: totalCount });
         showLoading(false);
         currentQuizData = res.questions;
         
+        // 進入測驗狀態
         violationCount = 0;
         violationLogs.length = 0;
         isQuizActive = true;
+        isViolationModalOpen = false;
 
         renderQuiz(res.questions);
       } catch (err) {
@@ -1159,6 +1271,7 @@
       document.getElementById('energyBarFill').style.width = `${percent}%`;
     }
 
+    /* ================= 6. 交卷與重試機制 ================= */
     async function handleSubmitQuizWithRetry() {
       const total = currentQuizData.length;
       const answeredCount = Object.keys(userAnswers).length;
@@ -1176,8 +1289,8 @@
         }
       }
 
-      isQuizActive = false;
-      showLoading(true, '📊 系統正在安全評分並記錄成績...');
+      isQuizActive = false; // 終止違規監聽
+      showLoading(true, '📊 系統正在安全評分並記錄課題表現...');
 
       const payload = {
         examRoom: document.getElementById('examRoomInput').value.trim() || '日常練習',
@@ -1193,7 +1306,7 @@
       localStorage.setItem('AIMATH_UNSUBMITTED_BACKUP', JSON.stringify(payload));
 
       let maxRetries = 3;
-      let delay = 3000;
+      let delay = 2000;
       let lastError = null;
 
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
