@@ -669,7 +669,7 @@
       <div class="user-hud-bar">
         <div class="hud-pill">
           <!-- 1. 編輯按鈕 -->
-          <button class="hud-btn-edit" onclick="openProfileModal(false)" title="修改暱稱與頭像">✏️</button>
+          <button class="hud-btn-edit" onclick="openProfileModal(false)" title="修改暱稱與頭像" style="display: none;">✏️</button>
           <!-- 2. 頭像槽 (點選也可開啟更換) -->
           <div class="hud-avatar-slot" onclick="openProfileModal(false)" style="cursor: pointer;" title="更換頭像">
             <img id="hudAvatarImg" src="" alt="Avatar">
@@ -677,11 +677,11 @@
           <!-- 3. 暱稱 -->
           <span id="hudNickname" class="hud-nickname">載入中...</span>
           <!-- 4. 等級 -->
-          <span id="hudLevel" class="hud-badge-slot hud-level">LV.1</span>
+          <span id="hudLevel" class="hud-badge-slot hud-level"></span>
           <!-- 5. 成就圖案 -->
-          <span id="hudAchievement" class="hud-badge-slot hud-achieve">🌱 新秀</span>
+          <span id="hudAchievement" class="hud-badge-slot hud-achieve"></span>
           <!-- 6. 稱號 -->
-          <span id="hudTitle" class="hud-badge-slot hud-title">初級學者</span>
+          <span id="hudTitle" class="hud-badge-slot hud-title"></span>
         </div>
       </div>
 
