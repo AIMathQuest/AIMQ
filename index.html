@@ -659,7 +659,7 @@
         </div>
       </div>
       <p style="color: var(--text-muted); font-size: 0.95rem;">
-        您今日學習了嗎？ Link Start!
+        今天學習了嗎？ Link Start!
       </p>
     </div>
 
@@ -849,10 +849,10 @@
 
     // 更新頂部 HUD 資訊
     function updateHudUI(profile) {
-      document.getElementById('hudNickname').textContent = profile.nickname || '未命名學者';
-      document.getElementById('hudLevel').textContent = profile.level || 'LV.1';
-      document.getElementById('hudAchievement').textContent = profile.achievement || '🌱 新秀';
-      document.getElementById('hudTitle').textContent = profile.title || '初級學者';
+      document.getElementById('hudNickname').textContent = profile.nickname || '未命名';
+      document.getElementById('hudLevel').textContent = `LV.${profile.level}`;
+      document.getElementById('hudAchievement').textContent = profile.achievement;
+      document.getElementById('hudTitle').textContent = profile.title;
 
       if (profile.avatarBase64) {
         document.getElementById('hudAvatarImg').src = profile.avatarBase64;
