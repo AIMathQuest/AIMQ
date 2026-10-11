@@ -316,7 +316,6 @@
       font-weight: 800;
     }
 
-    /* 測驗模式鎖定選取 */
     .category-chip.locked-category {
       background: #fff7ed !important;
       border-color: #f97316 !important;
@@ -326,7 +325,6 @@
       font-weight: 800 !important;
     }
 
-    /* 測驗模式徹底禁用反灰 */
     .category-chip.exam-forbidden {
       opacity: 0.35 !important;
       cursor: not-allowed !important;
@@ -626,7 +624,6 @@
       object-fit: cover;
     }
 
-    /* 抽獎數字展示徽章 */
     .lottery-nums-container {
       display: flex;
       flex-wrap: wrap;
@@ -752,7 +749,7 @@
     </div>
   </div>
 
-  <!-- 互動事件發動 Modal (輸入班別、姓名、信息) -->
+  <!-- 互動事件發動 Modal -->
   <div id="interactiveActionModal" class="modal-overlay">
     <div class="modal-card">
       <div style="text-align:center; font-size:3rem; margin-bottom:6px;" id="actionIcon">🎯</div>
@@ -890,6 +887,12 @@
           <span class="score-label" id="resTotalLabel">/ 0 題</span>
         </div>
         <h2 id="resultTitle" style="font-size: 1.6rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">提交完成！</h2>
+        
+        <!-- 流星雨祝福雙倍經驗特殊提示 -->
+        <div id="meteorExpBanner" style="display:none; background:#fef3c7; border:1.5px solid #f59e0b; color:#b45309; padding:8px 16px; border-radius:999px; font-weight:800; font-size:0.95rem; margin-bottom:12px; display:inline-block;">
+          🌠【流星雨下的祝福】生效！本次答對題數與課題表現以雙倍（x2）累記入庫！
+        </div>
+
         <p id="resultDesc" style="color: var(--text-muted); font-weight: 600;">已成功記錄於數據庫</p>
 
         <div class="stats-row">
@@ -937,7 +940,6 @@
     let isQuizActive = false;
     let isViolationModalOpen = false;
 
-    // 抽獎與事件管線佇列
     let activeLotteryData = null;
     let activePendingQueue = [];
     let currentActionType = '';
@@ -1049,6 +1051,17 @@
       return resJson;
     }
 
+    /**
+     * 判定當前是否處於多多益善效果限制 (練習模式下生效)
+     */
+    function isMoreTheMerrierActive() {
+      const isExam = currentExamConfig && currentExamConfig.isExamMode;
+      if (isExam) return false;
+      if (!currentUserProfile) return false;
+      const val = currentUserProfile.moreIsMerrierActive;
+      return val === '1' || val === 1 || String(val).trim() === '1';
+    }
+
     async function handleCredentialResponse(response) {
       userAuthToken = response.credential;
       showLoading(true, '🧙‍♂️ 登入驗證中...');
@@ -1068,7 +1081,7 @@
         applyExamConfigUI(currentExamConfig);
         renderGroupedCategories(res.categories);
 
-        // 登入時檢查是否受到「多多益善」效果 (練習模式下才觸發)
+        // 登入時檢查多多益善狀態
         checkMoreTheMerrierOnLogin();
 
         if (currentUserProfile.isFirstTime || !currentUserProfile.nickname) {
@@ -1084,7 +1097,7 @@
     function updateHudUI(profile) {
       document.getElementById('hudNickname').textContent = profile.nickname || '未命名';
       document.getElementById('hudAchievement').textContent = profile.achievement || '';
-      document.getElementById('hudLevel').textContent = 'LV.'+profile.level || '';
+      document.getElementById('hudLevel').textContent = profile.level ? ('LV.' + profile.level) : '';
       document.getElementById('hudTitle').textContent = profile.title || '';
 
       if (profile.avatarBase64) {
@@ -1093,17 +1106,17 @@
     }
 
     function checkMoreTheMerrierOnLogin() {
-      if (currentExamConfig && currentExamConfig.isExamMode) return; // 測驗模式下不檢測
+      if (currentExamConfig && currentExamConfig.isExamMode) return;
 
-      if (currentUserProfile && currentUserProfile.moreIsMerrierActive === '1') {
+      if (isMoreTheMerrierActive()) {
         const sender = currentUserProfile.moreIsMerrierSender || '某位神秘同學';
         const slider = document.getElementById('countSlider');
         const sliderVal = document.getElementById('sliderValue');
 
-        // 強制鎖定為 60 題
         slider.value = 60;
         sliderVal.textContent = '60 題 (🔒 強制鎖定)';
         slider.disabled = true;
+        slider.style.pointerEvents = 'none';
 
         showPendingNotice(
           '📜 技能生效提醒：多多益善',
@@ -1131,15 +1144,22 @@
           slider.value = config.questionCount;
           sliderVal.textContent = config.questionCount + ' 題';
           slider.disabled = true;
+          slider.style.pointerEvents = 'none';
           slider.title = '測驗模式已固定題數，不可更改';
         }
       } else {
         modeInput.value = '日常練習';
         modeInput.classList.remove('exam-active-mode');
         modeLabel.innerHTML = '🏫 目前模式';
-        // 若不受多多益善鎖定，恢復滑桿
-        if (!currentUserProfile || currentUserProfile.moreIsMerrierActive !== '1') {
+
+        if (isMoreTheMerrierActive()) {
+          slider.value = 60;
+          sliderVal.textContent = '60 題 (🔒 強制鎖定)';
+          slider.disabled = true;
+          slider.style.pointerEvents = 'none';
+        } else {
           slider.disabled = false;
+          slider.style.pointerEvents = 'auto';
         }
       }
     }
@@ -1262,7 +1282,13 @@
     window.addEventListener('DOMContentLoaded', () => {
       const slider = document.getElementById('countSlider');
       const sliderVal = document.getElementById('sliderValue');
+      
       slider.addEventListener('input', (e) => {
+        if (isMoreTheMerrierActive()) {
+          e.target.value = 60;
+          sliderVal.textContent = '60 題 (🔒 強制鎖定)';
+          return;
+        }
         sliderVal.textContent = e.target.value + ' 題';
       });
 
@@ -1331,14 +1357,14 @@
 
       items.forEach((catName, idx) => {
         const isTeacherLocked = isExam && lockedList.includes(catName);
-        const isExamForbidden = isExam && !lockedList.includes(catName); // 測驗模式中未被老師勾選的課題
+        const isExamForbidden = isExam && !lockedList.includes(catName);
         const isDefault = isTeacherLocked || (!isExam && shouldSelectFirst && idx === 0);
 
         const chip = document.createElement('label');
         let chipClass = 'category-chip';
         if (isDefault) chipClass += ' active';
         if (isTeacherLocked) chipClass += ' locked-category';
-        if (isExamForbidden) chipClass += ' exam-forbidden'; // 徹底反灰禁用
+        if (isExamForbidden) chipClass += ' exam-forbidden';
         chip.className = chipClass;
 
         chip.innerHTML = `
@@ -1368,7 +1394,7 @@
     }
 
     function toggleSelectAllGroup(groupId) {
-      if (currentExamConfig && currentExamConfig.isExamMode) return; // 測驗模式下禁用全選/取消
+      if (currentExamConfig && currentExamConfig.isExamMode) return;
 
       const groupBlock = document.getElementById(`group_${groupId}`);
       if (!groupBlock) return;
@@ -1403,7 +1429,11 @@
         return;
       }
 
-      const totalCount = parseInt(document.getElementById('countSlider').value, 10);
+      let totalCount = parseInt(document.getElementById('countSlider').value, 10);
+      if (isMoreTheMerrierActive()) {
+        totalCount = 60;
+      }
+
       showLoading(true, '⚡ 正在為您配置題目中...');
 
       try {
@@ -1528,7 +1558,6 @@
           localStorage.removeItem('AIMATH_UNSUBMITTED_BACKUP');
           renderResult(res.result);
           
-          // 啟動交卷後優先級事件管線
           startPostSubmissionPipeline(res.result);
           return;
         } catch (err) {
@@ -1552,6 +1581,14 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
       fireCampusConfetti();
+
+      // 流星雨下的祝福雙倍提示橫幅
+      const meteorBanner = document.getElementById('meteorExpBanner');
+      if (result.meteorShowerApplied) {
+        meteorBanner.style.display = 'inline-block';
+      } else {
+        meteorBanner.style.display = 'none';
+      }
 
       animateValue('resCorrect', 0, result.correctCount, 1000);
       document.getElementById('resTotalLabel').textContent = `/ ${result.totalQuestions} 題`;
@@ -1637,14 +1674,24 @@
       activeLotteryData = result.lotteryResult;
       activePendingQueue = [];
 
-      // 佇列：檢查自身待觸發項目 (依嚴格優先順序)
+      // 若流星雨觸發過，同步更新本地狀態
+      if (result.meteorShowerApplied && currentUserProfile) {
+        currentUserProfile.meteorShowerActive = '0';
+      }
+
+      // 若多多益善解除，同步更新本地狀態
+      if (result.duoDuoYiShanCleared && currentUserProfile) {
+        currentUserProfile.moreIsMerrierActive = '0';
+        currentUserProfile.moreIsMerrierSender = '';
+      }
+
       const p = result.pendingTriggers || {};
       if (p.meteorShower) {
         activePendingQueue.push({
           type: 'meteorShower',
           title: '🌠 事件獎勵：流星雨下的祝福',
           icon: '🌠',
-          content: `流星雨下，您已獲得來自【<b>${escapeHtml(p.meteorShower.sender || '某同學')}</b>】的祝福！<br>你們都將在下一次的答題中獲得<b>雙倍經驗</b>！`
+          content: `流星雨下，您已獲得來自【<b>${escapeHtml(p.meteorShower.sender || '某同學')}</b>】的祝福！<br>你們都將在下一次的答題中獲得<b>雙倍經驗（答對與課題表現 x2 入庫）</b>！`
         });
       }
       if (p.megaphone) {
@@ -1678,7 +1725,6 @@
         });
       }
 
-      // 步驟 1：先展示抽獎
       setTimeout(showLotteryModal, 800);
     }
 
@@ -1751,7 +1797,7 @@
       else if (chosenWish === 'more') openInteractiveActionModal('more_the_merrier');
     }
 
-    /* 互動發動彈窗 (流星雨/傳聲筒/多多益善/回聲筒) */
+    /* 互動發動彈窗 */
     function openInteractiveActionModal(type, prefillClass = '', prefillName = '') {
       currentActionType = type;
       const modal = document.getElementById('interactiveActionModal');
@@ -1820,7 +1866,6 @@
         alert(res.message || '發送成功！');
         document.getElementById('interactiveActionModal').style.display = 'none';
         
-        // 進入後續待觸發事件隊列
         processNextPendingNotice();
       } catch (err) {
         showLoading(false);
@@ -1828,7 +1873,6 @@
       }
     }
 
-    /* 處理待觸發隊列 */
     function processNextPendingNotice() {
       if (activePendingQueue.length === 0) return;
       const item = activePendingQueue.shift();
@@ -1892,11 +1936,23 @@
       document.getElementById('pendingNoticeModal').style.display = 'none';
     }
 
-    /* 輔助函數 */
     function handleResetToSetup() {
       document.getElementById('resultView').style.display = 'none';
       document.getElementById('setupView').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // 返回自定義設置時重新應用當前限制
+      const slider = document.getElementById('countSlider');
+      const sliderVal = document.getElementById('sliderValue');
+      if (isMoreTheMerrierActive()) {
+        slider.value = 60;
+        sliderVal.textContent = '60 題 (🔒 強制鎖定)';
+        slider.disabled = true;
+        slider.style.pointerEvents = 'none';
+      } else if (!currentExamConfig || !currentExamConfig.isExamMode) {
+        slider.disabled = false;
+        slider.style.pointerEvents = 'auto';
+      }
     }
 
     function fireCampusConfetti() {
