@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AIMathQuest 遊戲互動式數學AI學習系統</title>
+  <title>AIMathQuest</title>
   <!-- Google 官方登入套件 -->
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <!-- 煙花粒子庫 -->
@@ -633,14 +633,14 @@
 
   <div class="app-container">
     <div class="header-area">
-      <h1 class="brand-title">AIMathQuest 遊戲互動式數學AI學習系統</h1>
-      <p class="brand-subtitle">自主學習・即時診斷・遊戲互動</p>
+      <h1 class="brand-title">AIMathQuest</h1>
+      <p class="brand-subtitle">自主學習・即時回應・遊戲互動</p>
     </div>
 
     <!-- 步驟 0：登入驗證區塊 -->
     <div id="authView" class="campus-card" style="text-align: center; padding: 40px 20px;">
       <div style="font-size: 3rem; margin-bottom: 16px;">🏫</div>
-      <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 8px;">請使用學校 Google 學生帳號登入</h2>
+      <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 8px;">請使用學校 Google 帳號登入</h2>
 
       <div style="display: flex; justify-content: center; margin-bottom: 20px;">
         <div id="g_id_onload"
@@ -1083,7 +1083,7 @@
       }
 
       const totalCount = parseInt(document.getElementById('countSlider').value, 10);
-      showLoading(true, '⚡ 正在為您智慧配置考卷中...');
+      showLoading(true, '⚡ 正在為您智慧配置題目中...');
 
       try {
         const res = await callGasApi('generateQuiz', { selectedCategories: selectedCats, totalCount: totalCount });
@@ -1193,7 +1193,7 @@
       localStorage.setItem('AIMATH_UNSUBMITTED_BACKUP', JSON.stringify(payload));
 
       let maxRetries = 3;
-      let delay = 2000;
+      let delay = 3000;
       let lastError = null;
 
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
