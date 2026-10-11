@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI素養自生成練習</title>
+  <!-- 引入 Google 官方登入套件 -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <!-- 引入輕量煙花彩帶庫 -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --secondary: #0284c7;
+      --accent-gold: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --bg-page: #f1f5f9;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang TC", "Microsoft JhengHei", sans-serif;
+      user-select: none;
+    }
+
+    body {
+      background: var(--bg-page);
+      background-image: 
+        radial-gradient(circle at 10% 20%, rgba(37, 99, 235, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(2, 132, 199, 0.06) 0%, transparent 40%);
+      min-height: 100vh;
+      color: var(--text-main);
+      position: relative;
+    }
+
+    .star-particle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 99999;
+      font-size: 22px;
+      animation: starBurst 0.65s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+    }
+
+    @keyframes starBurst {
+      0% { transform: translate(0, 0) scale(1.1) rotate(0deg); opacity: 1; }
+      100% { transform: translate(var(--dx), var(--dy)) scale(0.2) rotate(200deg); opacity: 0; }
+    }
+
+    .app-container {
+      max-width: 820px;
+      margin: 32px auto;
+      padding: 0 16px 80px 16px;
+    }
+
+    .header-area {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .brand-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+      margin-bottom: 6px;
+    }
+
+    .brand-subtitle {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .campus-card {
+      background: var(--card-bg);
+      border-radius: 20px;
+      padding: 28px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.06), 0 4px 10px -2px rgba(15, 23, 42, 0.03);
+      border: 1px solid var(--border-color);
+      margin-bottom: 20px;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .form-group { margin-bottom: 26px; }
+
+    .form-label {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .category-group-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .group-block {
+      background: #f8fafc;
+      border: 1.5px solid var(--border-color);
+      border-radius: 16px;
+      padding: 16px 18px;
+      transition: all 0.2s ease;
+    }
+
+    .group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .group-title-box { display: flex; align-items: center; gap: 8px; }
+    .group-title { font-size: 1.02rem; font-weight: 800; color: #0f172a; }
+    .group-subtitle { font-size: 0.82rem; color: var(--text-muted); font-weight: 600; }
+
+    .btn-group-toggle {
+      background: #e2e8f0;
+      color: #334155;
+      border: none;
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-group-toggle:hover { background: #dbeafe; color: var(--primary); }
+
+    .group-items-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .category-chip {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 11px 14px;
+      border-radius: 10px;
+      background: #ffffff;
+      border: 1.5px solid var(--border-color);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #475569;
+      transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.02);
+    }
+    .category-chip input { display: none; }
+    .category-chip:hover { border-color: #93c5fd; transform: translateY(-1px); }
+    .category-chip.active {
+      background: #eff6ff;
+      border-color: var(--primary);
+      color: var(--primary);
+      box-shadow: 0 3px 8px rgba(37, 99, 235, 0.15);
+      font-weight: 800;
+    }
+
+    .slider-box {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border-color);
+    }
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .slider-badge {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--primary);
+      background: #dbeafe;
+      padding: 4px 14px;
+      border-radius: 999px;
+    }
+    .range-slider {
+      width: 100%;
+      height: 8px;
+      border-radius: 4px;
+      background: #cbd5e1;
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+    }
+    .range-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--primary);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+      transition: transform 0.1s;
+    }
+
+    .btn-campus {
+      width: 100%;
+      padding: 16px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--primary) 0%, #1e40af 100%);
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+      transition: all 0.2s ease;
+    }
+    .btn-campus:hover {
+      background: linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 100%);
+      transform: translateY(-2px);
+    }
+
+    .question-card {
+      background: #ffffff;
+      border-radius: 18px;
+      padding: 24px 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+      border: 1px solid var(--border-color);
+    }
+    .q-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .q-category-tag {
+      background: #e0f2fe;
+      color: #0369a1;
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+    .q-counter { font-weight: 800; font-size: 0.95rem; color: var(--secondary); }
+    .q-content { font-size: 1.12rem; font-weight: 700; color: #0f172a; line-height: 1.6; margin-bottom: 18px; }
+
+    .options-list { display: flex; flex-direction: column; gap: 10px; }
+    .option-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 13px 16px;
+      background: #f8fafc;
+      border: 1.5px solid var(--border-color);
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .option-item:hover { background: #f1f5f9; border-color: #94a3b8; }
+    .option-item.selected { background: #eff6ff; border-color: var(--primary); }
+    .option-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.95rem;
+      color: #475569;
+      flex-shrink: 0;
+    }
+    .option-item.selected .option-circle { background: var(--primary); color: #ffffff; }
+    .option-text { font-size: 1rem; font-weight: 600; color: #334155; line-height: 1.5; word-break: break-word; }
+
+    .result-center { text-align: center; padding: 10px 0 20px 0; }
+    .score-badge-circle {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px auto;
+      color: #ffffff;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.3);
+    }
+    .score-num { font-size: 2.8rem; font-weight: 900; line-height: 1; }
+    .score-label { font-size: 0.85rem; font-weight: 700; opacity: 0.9; }
+
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+    .stat-card {
+      background: #f8fafc;
+      padding: 16px;
+      border-radius: 12px;
+      border: 1.5px solid var(--border-color);
+      text-align: center;
+    }
+    .stat-card-val { font-size: 1.7rem; font-weight: 900; color: var(--primary); }
+    .stat-card-title { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; }
+
+    .wrong-item {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
+      border-left: 5px solid var(--danger);
+      border-top: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+    }
+    .review-options-container { display: flex; flex-direction: column; gap: 8px; margin: 14px 0 16px 0; }
+    .review-opt {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 14px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 10px;
+    }
+    .review-opt.opt-user-wrong { background: #fef2f2; border-color: #f87171; }
+    .review-opt.opt-correct { background: #f0fdf4; border-color: #4ade80; }
+    .review-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+      color: #475569;
+      flex-shrink: 0;
+    }
+    .review-opt.opt-user-wrong .review-circle { background: var(--danger); color: #ffffff; }
+    .review-opt.opt-correct .review-circle { background: var(--success); color: #ffffff; }
+    .review-text { flex: 1; font-size: 0.95rem; font-weight: 600; color: #334155; line-height: 1.4; word-break: break-word; }
+    .review-opt.opt-correct .review-text { color: #166534; font-weight: 700; }
+    .review-opt.opt-user-wrong .review-text { color: #991b1b; font-weight: 700; }
+    .review-flag { padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
+    .flag-wrong { background: #fee2e2; color: #b91c1c; }
+    .flag-correct { background: #dcfce7; color: #15803d; }
+
+    .explanation-container {
+      padding: 14px 16px;
+      background: #f0f9ff;
+      border-radius: 10px;
+      border-left: 4px solid var(--secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #0369a1;
+    }
+
+    .loader-box {
+      position: fixed;
+      inset: 0;
+      background: rgba(241, 245, 249, 0.88);
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 1.2rem;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #cbd5e1;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* 登入區塊樣式 */
+    .login-container {
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .login-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+    }
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 8px 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <div class="header-area">
+      <h1 class="brand-title">AI素養自生成練習</h1>
+      <p class="brand-subtitle">自主學習・智能抽題・即時診斷</p>
+    </div>
+
+    <!-- 步驟 0：學校帳號驗證區塊 (預設顯示) -->
+    <div id="authView" class="campus-card login-container">
+      <div class="login-icon">🏫</div>
+      <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 8px;">請使用學校 Google 學生帳號登入</h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 24px;">
+        本系統僅限本校網域用戶存取，登入後系統將自動記錄練習成績。
+      </p>
+
+      <div style="display: flex; justify-content: center;">
+        <!-- ⚠️ 請將 YOUR_CLIENT_ID 與 data-hd 修改為您的設定 -->
+        <div id="g_id_onload"
+             data-client_id="171734689833-dllsjer747lvi8a416ittgsvilept2r5.apps.googleusercontent.com"
+             data-context="signin"
+             data-ux_mode="popup"
+             data-hd="g.puiching.edu.mo"
+             data-callback="handleCredentialResponse"
+             data-auto_prompt="false">
+        </div>
+        <div class="g_id_signin"
+             data-type="standard"
+             data-shape="rectangular"
+             data-theme="outline"
+             data-text="signin_with"
+             data-size="large"
+             data-logo_alignment="left">
+        </div>
+      </div>
+    </div>
+
+    <!-- 步驟 1：客製設定介面 (登入後顯示) -->
+    <div id="setupView" class="campus-card" style="display: none;">
+      <div style="text-align: right; margin-bottom: 12px;">
+        <span id="userBadge" class="user-pill">👤 載入中...</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">📂 選擇練習範疇 (依類別自選或全選)</label>
+        <div id="categoryGroupContainer" class="category-group-list">
+          <div style="color: var(--text-muted); font-size: 0.95rem;">正在驗證身分並載入題庫...</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="slider-box">
+          <div class="slider-header">
+            <span class="form-label" style="margin-bottom:0;">🎯 本次測驗題數</span>
+            <span id="sliderValue" class="slider-badge">30 題</span>
+          </div>
+          <input type="range" id="countSlider" class="range-slider" min="20" max="60" step="10" value="30">
+        </div>
+      </div>
+
+      <button id="btnStart" class="btn-campus" onclick="handleStartQuiz()">🚀 隨機生成測驗卷</button>
+    </div>
+
+    <!-- 步驟 2：作答頁面 -->
+    <div id="quizView" style="display: none;">
+      <div id="questionsScrollContainer"></div>
+      <div class="campus-card" style="margin-top: 20px;">
+        <button id="btnSubmit" class="btn-campus" onclick="handleSubmitQuiz()">📝 完成並提交作答</button>
+      </div>
+    </div>
+
+    <!-- 步驟 3：結算展示與錯題診斷 -->
+    <div id="resultView" class="campus-card" style="display: none;">
+      <div class="result-center">
+        <div class="score-badge-circle">
+          <span class="score-num" id="resCorrect">0</span>
+          <span class="score-label" id="resTotalLabel">/ 0 題</span>
+        </div>
+        <h2 id="resultTitle" style="font-size: 1.6rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">測驗完成！</h2>
+        <p id="resultDesc" style="color: var(--text-muted); font-weight: 600;">已成功記錄於後端試算表</p>
+
+        <div class="stats-row">
+          <div class="stat-card">
+            <div class="stat-card-val" id="resAccuracy">0%</div>
+            <div class="stat-card-title">本次答對率</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-card-val" id="resAllTimeCorrect">0</div>
+            <div class="stat-card-title">🌟 累計答對總題數</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="wrongSection">
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: #1e293b; margin-bottom: 14px;">
+          🔍 錯題診斷與詳解
+        </h3>
+        <div id="wrongListContainer"></div>
+      </div>
+
+      <div style="margin-top: 26px;">
+        <button class="btn-campus" onclick="handleResetToSetup()">🔄 再次測試 (返回自定義設置)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading 提示 -->
+  <div id="loadingOverlay" class="loader-box" style="display: none;">
+    <div class="spinner"></div>
+    <div id="loadingText">題目準備中...</div>
+  </div>
+
+  <script>
+    // ⚠️ 請修改為您的 GAS 部署網址
+    const GAS_API_URL = 'https://script.google.com/macros/s/AKfycbzeCbqDf1f9qSznpTax3LfViPqESYe6Pcck1-wYtve0RbtGTBxlLPl46Qh0dSP9ANsw/exec';
+
+    let userAuthToken = '';
+    let currentQuizData = [];
+    const userAnswers = {};
+
+    const GROUP_DEFINITIONS = [
+      {
+        id: 'literacy',
+        title: '📘 AI素養類',
+        subtitle: '核心通識與歷史倫理',
+        items: ['人工智能發展簡史', '人工智能與道德倫理', '人工智能初探', '人工智能學習方式']
+      },
+      {
+        id: 'genai',
+        title: '✨ 生成式AI三部曲',
+        subtitle: '前沿大模型與智慧體指南',
+        items: ['零基礎學AI', '大模型提示詞工程指南', '智能體AI權威指南']
+      },
+      {
+        id: 'cert',
+        title: '🏆 專業認證類',
+        subtitle: '等級認證實戰模擬',
+        items: ['AISE一級認證', 'AISE二級認證']
+      }
+    ];
+
+    // 通用呼叫 GAS API 函式 (取代 google.script.run)
+    async function callGasApi(action, data = {}) {
+      const response = await fetch(GAS_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 避免觸發繁雜的 CORS preflight
+        body: JSON.stringify({ action: action, token: userAuthToken, data: data })
+      });
+      const resJson = await response.json();
+      if (resJson.status !== 'success') {
+        throw new Error(resJson.message || '操作失敗');
+      }
+      return resJson;
+    }
+
+    // Google 登入回調
+    async function handleCredentialResponse(response) {
+      userAuthToken = response.credential;
+      showLoading(true, '🔐 正在向學校驗證伺服器確認身分...');
+
+      try {
+        const res = await callGasApi('getCategories');
+        showLoading(false);
+
+        // 登入成功，切換視圖
+        document.getElementById('authView').style.display = 'none';
+        document.getElementById('setupView').style.display = 'block';
+        document.getElementById('userBadge').textContent = `👤 ${res.user.name} (${res.user.email})`;
+
+        renderGroupedCategories(res.categories);
+      } catch (err) {
+        showLoading(false);
+        alert('登入失敗：' + err.message);
+      }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const slider = document.getElementById('countSlider');
+      const sliderVal = document.getElementById('sliderValue');
+      slider.addEventListener('input', (e) => {
+        sliderVal.textContent = e.target.value + ' 題';
+      });
+    });
+
+    function renderGroupedCategories(availableSheets) {
+      const container = document.getElementById('categoryGroupContainer');
+      container.innerHTML = '';
+
+      if (!availableSheets || availableSheets.length === 0) {
+        container.innerHTML = '<div style="color:var(--danger); font-weight: bold;">未偵測到題目分頁，請確認題庫！</div>';
+        return;
+      }
+
+      const matchedSheets = new Set();
+      let firstAssigned = false;
+
+      GROUP_DEFINITIONS.forEach(group => {
+        const currentGroupSheets = group.items.filter(item => {
+          const exists = availableSheets.includes(item);
+          if (exists) matchedSheets.add(item);
+          return exists;
+        });
+
+        if (currentGroupSheets.length > 0) {
+          const block = createGroupBlock(group.id, group.title, group.subtitle, currentGroupSheets, !firstAssigned);
+          if (!firstAssigned) firstAssigned = true;
+          container.appendChild(block);
+        }
+      });
+
+      const extraSheets = availableSheets.filter(sheet => !matchedSheets.has(sheet));
+      if (extraSheets.length > 0) {
+        const extraBlock = createGroupBlock('other', '📌 其他延伸主題', '自訂進階練習題庫', extraSheets, false);
+        container.appendChild(extraBlock);
+      }
+    }
+
+    function createGroupBlock(groupId, title, subtitle, items, shouldSelectFirst) {
+      const block = document.createElement('div');
+      block.className = 'group-block';
+      block.id = `group_${groupId}`;
+
+      const header = document.createElement('div');
+      header.className = 'group-header';
+      header.innerHTML = `
+        <div class="group-title-box">
+          <span class="group-title">${title}</span>
+          <span class="group-subtitle">${subtitle}</span>
+        </div>
+        <button type="button" class="btn-group-toggle" onclick="toggleSelectAllGroup('${groupId}')">全選 / 取消</button>
+      `;
+      block.appendChild(header);
+
+      const grid = document.createElement('div');
+      grid.className = 'group-items-grid';
+
+      items.forEach((catName, idx) => {
+        const isDefault = shouldSelectFirst && idx === 0;
+        const chip = document.createElement('label');
+        chip.className = 'category-chip ' + (isDefault ? 'active' : '');
+        chip.innerHTML = `
+          <input type="checkbox" name="catCheck" data-group="${groupId}" value="${escapeHtml(catName)}" ${isDefault ? 'checked' : ''}>
+          <span>${escapeHtml(catName)}</span>
+        `;
+        chip.addEventListener('click', () => {
+          setTimeout(() => {
+            const isChecked = chip.querySelector('input').checked;
+            chip.classList.toggle('active', isChecked);
+          }, 10);
+        });
+        grid.appendChild(chip);
+      });
+
+      block.appendChild(grid);
+      return block;
+    }
+
+    function toggleSelectAllGroup(groupId) {
+      const groupBlock = document.getElementById(`group_${groupId}`);
+      if (!groupBlock) return;
+
+      const inputs = groupBlock.querySelectorAll('input[type="checkbox"]');
+      const allChecked = Array.from(inputs).every(i => i.checked);
+
+      inputs.forEach(input => {
+        input.checked = !allChecked;
+        const label = input.closest('.category-chip');
+        if (label) label.classList.toggle('active', !allChecked);
+      });
+    }
+
+    function getOptionText(opt) {
+      if (opt === null || opt === undefined) return '';
+      if (typeof opt === 'object') {
+        return String(opt.text || opt.value || opt.name || opt.label || Object.values(opt)[0] || '');
+      }
+      return String(opt);
+    }
+
+    async function handleStartQuiz() {
+      const checkedBoxes = document.querySelectorAll('input[name="catCheck"]:checked');
+      const selectedCats = Array.from(checkedBoxes).map(cb => cb.value);
+      if (selectedCats.length === 0) {
+        alert('請至少勾選一個練習範疇！');
+        return;
+      }
+
+      const totalCount = parseInt(document.getElementById('countSlider').value, 10);
+      showLoading(true, '⚡ 正在為您智慧配置考卷中...');
+
+      try {
+        const res = await callGasApi('generateQuiz', { selectedCategories: selectedCats, totalCount: totalCount });
+        showLoading(false);
+        currentQuizData = res.questions;
+        renderQuiz(res.questions);
+      } catch (err) {
+        showLoading(false);
+        alert('生成測驗失敗：' + err.message);
+      }
+    }
+
+    function renderQuiz(questions) {
+      const container = document.getElementById('questionsScrollContainer');
+      container.innerHTML = '';
+      Object.keys(userAnswers).forEach(key => delete userAnswers[key]);
+
+      const letters = ['A', 'B', 'C', 'D'];
+
+      questions.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `qCard_${qIndex}`;
+
+        let optionsHtml = '';
+        q.options.forEach((optRaw, optIdx) => {
+          const letter = letters[optIdx];
+          const optText = getOptionText(optRaw);
+
+          optionsHtml += `
+            <div class="option-item" onclick="selectOption(${qIndex}, '${letter}', this)">
+              <div class="option-circle">${letter}</div>
+              <div class="option-text">${escapeHtml(optText)}</div>
+            </div>
+          `;
+        });
+
+        card.innerHTML = `
+          <div class="q-meta">
+            <span class="q-category-tag">📂 ${escapeHtml(q.category)}</span>
+            <span class="q-counter">第 ${qIndex + 1} 題 / 共 ${questions.length} 題</span>
+          </div>
+          <div class="q-content">${escapeHtml(q.question)}</div>
+          <div class="options-list">${optionsHtml}</div>
+        `;
+        container.appendChild(card);
+      });
+
+      document.getElementById('setupView').style.display = 'none';
+      document.getElementById('quizView').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function selectOption(qIndex, letter, elem) {
+      userAnswers[qIndex] = letter;
+      const card = document.getElementById(`qCard_${qIndex}`);
+      card.querySelectorAll('.option-item').forEach(item => item.classList.remove('selected'));
+      elem.classList.add('selected');
+    }
+
+    async function handleSubmitQuiz() {
+      const total = currentQuizData.length;
+      const answeredCount = Object.keys(userAnswers).length;
+
+      if (answeredCount < total) {
+        const unanswered = total - answeredCount;
+        if (!confirm(`尚有 ${unanswered} 題未作答，確定要現在提交嗎？`)) {
+          for (let i = 0; i < total; i++) {
+            if (!userAnswers[i]) {
+              document.getElementById(`qCard_${i}`).scrollIntoView({ behavior: 'smooth', block: 'center' });
+              break;
+            }
+          }
+          return;
+        }
+      }
+
+      showLoading(true, '📊 系統正在安全評分並記錄成績...');
+
+      const payload = {
+        answers: currentQuizData.map((q, idx) => ({
+          sheetName: q.sheetName,
+          row: q.row,
+          choice: userAnswers[idx] || ''
+        }))
+      };
+
+      try {
+        const res = await callGasApi('submitQuiz', { payload: payload });
+        renderResult(res.result);
+      } catch (err) {
+        showLoading(false);
+        alert('提交評分失敗：' + err.message);
+      }
+    }
+
+    function renderResult(result) {
+      showLoading(false);
+
+      document.getElementById('quizView').style.display = 'none';
+      document.getElementById('resultView').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      fireCampusConfetti();
+
+      animateValue('resCorrect', 0, result.correctCount, 1000);
+      document.getElementById('resTotalLabel').textContent = `/ ${result.totalQuestions} 題`;
+
+      const accuracy = result.totalQuestions > 0 
+        ? Math.round((result.correctCount / result.totalQuestions) * 100) 
+        : 0;
+      document.getElementById('resAccuracy').textContent = accuracy + '%';
+      animateValue('resAllTimeCorrect', 0, result.userAllTimeCorrect, 1200);
+
+      const titleElem = document.getElementById('resultTitle');
+      if (accuracy === 100) {
+        titleElem.textContent = '🌟 滿分完美通關！表現卓越！';
+      } else if (accuracy >= 80) {
+        titleElem.textContent = '👏 實力優異！掌握得非常扎實！';
+      } else if (accuracy >= 60) {
+        titleElem.textContent = '👍 成績良好！持續保持！';
+      } else {
+        titleElem.textContent = '💪 還有進步空間，繼續加油！';
+      }
+
+      const wrongContainer = document.getElementById('wrongListContainer');
+      wrongContainer.innerHTML = '';
+
+      if (result.wrongQuestions.length === 0) {
+        wrongContainer.innerHTML = `
+          <div style="text-align: center; padding: 20px; color: var(--success); font-weight: 800; font-size: 1.1rem;">
+            🎉 太厲害了！本次練習全部答對，沒有錯題！
+          </div>
+        `;
+      } else {
+        const letters = ['A', 'B', 'C', 'D'];
+        result.wrongQuestions.forEach((item) => {
+          const card = document.createElement('div');
+          card.className = 'wrong-item';
+
+          let optionsReviewHtml = '<div class="review-options-container">';
+          letters.forEach((letter, optIdx) => {
+            const optText = getOptionText(item.options ? item.options[optIdx] : '');
+            const isUserChoice = (letter === item.userChoice);
+            const isCorrect = (letter === item.correctAnswer);
+
+            let optClass = 'review-opt';
+            let flagHtml = '';
+
+            if (isCorrect) {
+              optClass += ' opt-correct';
+              flagHtml = '<span class="review-flag flag-correct">✅ 正確答案</span>';
+            } else if (isUserChoice) {
+              optClass += ' opt-user-wrong';
+              flagHtml = '<span class="review-flag flag-wrong">❌ 您的選擇</span>';
+            }
+
+            optionsReviewHtml += `
+              <div class="${optClass}">
+                <div class="review-circle">${letter}</div>
+                <div class="review-text">${escapeHtml(optText)}</div>
+                ${flagHtml}
+              </div>
+            `;
+          });
+          optionsReviewHtml += '</div>';
+
+          card.innerHTML = `
+            <div style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 6px;">
+              [${escapeHtml(item.category)}] 題號：${escapeHtml(item.id)}
+            </div>
+            <div style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; line-height: 1.5;">
+              ${escapeHtml(item.question)}
+            </div>
+            ${optionsReviewHtml}
+            <div class="explanation-container">
+              💡 <b>題目解析：</b><br>${escapeHtml(item.explanation)}
+            </div>
+          `;
+          wrongContainer.appendChild(card);
+        });
+      }
+    }
+
+    function handleResetToSetup() {
+      document.getElementById('resultView').style.display = 'none';
+      document.getElementById('setupView').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function fireCampusConfetti() {
+      const duration = 2.5 * 1000;
+      const animationEnd = Date.now() + duration;
+      const interval = setInterval(function() {
+        const timeLeft = animationEnd - Date.now();
+        if (timeLeft <= 0) return clearInterval(interval);
+        confetti({
+          particleCount: 40,
+          spread: 80,
+          origin: { x: Math.random() * 0.6 + 0.2, y: Math.random() - 0.2 },
+          colors: ['#2563eb', '#0284c7', '#f59e0b', '#10b981']
+        });
+      }, 300);
+    }
+
+    function animateValue(id, start, end, duration) {
+      const obj = document.getElementById(id);
+      if (start === end) { obj.textContent = end; return; }
+      const range = end - start;
+      let current = start;
+      const increment = end > start ? 1 : -1;
+      const stepTime = Math.abs(Math.floor(duration / (range || 1)));
+      const timer = setInterval(function() {
+        current += increment * Math.ceil(Math.abs(range) / 25);
+        if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+          obj.textContent = end;
+          clearInterval(timer);
+        } else {
+          obj.textContent = current;
+        }
+      }, Math.max(stepTime, 20));
+    }
+
+    function showLoading(show, text) {
+      const overlay = document.getElementById('loadingOverlay');
+      if (show) {
+        document.getElementById('loadingText').textContent = text || '載入中...';
+        overlay.style.display = 'flex';
+      } else {
+        overlay.style.display = 'none';
+      }
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+  </script>
+</body>
+</html>
