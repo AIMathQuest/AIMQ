@@ -460,7 +460,17 @@
       border-radius: 6px;
     }
     .q-counter { font-weight: 800; font-size: 0.95rem; color: var(--secondary); }
-    .q-content { font-size: 1.12rem; font-weight: 700; color: #0f172a; line-height: 1.6; margin-bottom: 18px; }
+    .q-content {
+	  font-size: 1.08rem;
+	  font-weight: 700;
+	  color: #0f172a;
+	  line-height: 1.6;
+	  margin-bottom: 18px;
+	  /* 核心：保留 Python 縮排空格與換行，且能自適應換行 */
+	  white-space: pre-wrap;
+	  word-break: break-word;
+	  font-family: 'Consolas', 'Roboto Mono', 'Fira Code', 'Courier New', monospace;
+	}
 
     .options-list { display: flex; flex-direction: column; gap: 10px; }
     .option-item {
@@ -490,7 +500,15 @@
       flex-shrink: 0;
     }
     .option-item.selected .option-circle { background: var(--primary); color: #ffffff; }
-    .option-text { font-size: 1rem; font-weight: 600; color: #334155; line-height: 1.5; word-break: break-word; }
+    .option-text {
+	  font-size: 1rem;
+	  font-weight: 600;
+	  color: #334155;
+	  line-height: 1.5;
+	  word-break: break-word;
+	  white-space: pre-wrap;
+	  font-family: 'Consolas', 'Roboto Mono', 'Segoe UI', monospace;
+	}
 
     .result-center { text-align: center; padding: 10px 0 20px 0; }
     .score-badge-circle {
@@ -557,19 +575,31 @@
     }
     .review-opt.opt-user-wrong .review-circle { background: var(--danger); color: #ffffff; }
     .review-opt.opt-correct .review-circle { background: var(--success); color: #ffffff; }
-    .review-text { flex: 1; font-size: 0.95rem; font-weight: 600; color: #334155; line-height: 1.4; word-break: break-word; }
-    .review-flag { padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
+    .review-text {
+	  flex: 1;
+	  font-size: 0.95rem;
+	  font-weight: 600;
+	  color: #334155;
+	  line-height: 1.4;
+	  word-break: break-word;
+	  white-space: pre-wrap;
+	  font-family: 'Consolas', 'Roboto Mono', monospace;
+	}
+	.review-flag { padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
     .flag-wrong { background: #fee2e2; color: #b91c1c; }
     .flag-correct { background: #dcfce7; color: #15803d; }
     .explanation-container {
-      padding: 14px 16px;
-      background: #f0f9ff;
-      border-radius: 10px;
-      border-left: 4px solid var(--secondary);
-      font-size: 0.95rem;
-      line-height: 1.6;
-      color: #0369a1;
-    }
+	  padding: 14px 16px;
+	  background: #f0f9ff;
+	  border-radius: 10px;
+	  border-left: 4px solid var(--secondary);
+	  font-size: 0.95rem;
+	  line-height: 1.6;
+	  color: #0369a1;
+	  white-space: pre-wrap;
+	  word-break: break-word;
+	  font-family: 'Consolas', 'Roboto Mono', sans-serif;
+	}
 
     .loader-box {
       position: fixed;
