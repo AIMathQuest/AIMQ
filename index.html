@@ -1725,41 +1725,49 @@
         });
       }
 
-      setTimeout(showLotteryModal, 800);
+      setTimeout(showLotteryModal, 1200);
     }
 
     function showLotteryModal() {
-      if (!activeLotteryData) return;
+	  if (!activeLotteryData) return;
 
-      const modal = document.getElementById('lotteryResultModal');
-      const desc = document.getElementById('lotteryModalDesc');
-      const box = document.getElementById('lotteryNumbersBox');
-      const prizeBanner = document.getElementById('lotteryPrizeBanner');
-      const prizeName = document.getElementById('lotteryPrizeName');
+	  const modal = document.getElementById('lotteryResultModal');
+	  const desc = document.getElementById('lotteryModalDesc');
+	  const box = document.getElementById('lotteryNumbersBox');
+	  const prizeBanner = document.getElementById('lotteryPrizeBanner');
+	  const prizeName = document.getElementById('lotteryPrizeName');
 
-      const d = activeLotteryData;
-      desc.innerHTML = `
-        🎯 基礎抽獎數：<b>${d.baseLotteryCount}</b> 個 ｜ 最終抽獎數：<b>${d.numC}</b> 個<br>
-        🌟 本期中獎號碼：<b style="color:#ef4444; font-size:1.25rem;">【 ${d.winningNumber} 】</b>
-      `;
+	  const d = activeLotteryData;
+	  let descHtml = `🎯 基礎抽獎數：<b>${d.baseLotteryCount}</b> 個 ｜ 數字B：<b>${d.numB}</b> ｜ 數字C：<b>${d.numC}</b> 個`;
+	  
+	  if (d.multiplier > 1) {
+		descHtml += ` ｜ 加乘倍率：<b style="color:#f59e0b;">x${d.multiplier}</b>`;
+	  }
+	  descHtml += `<br>🎰 最終抽取號碼數：<b style="color:#2563eb; font-size:1.15rem;">${d.finalDrawCount}</b> 個`;
+	  
+	  if (d.finalDrawCount >= 400) {
+		descHtml += ` <span style="color:#10b981; font-weight:800;">(已達400上限，100%必中獎！)</span>`;
+	  }
+	  descHtml += `<br>🌟 本期中獎號碼：<b style="color:#ef4444; font-size:1.25rem;">【 ${d.winningNumber} 】</b>`;
+	  desc.innerHTML = descHtml;
 
-      box.innerHTML = '';
-      d.drawnNumbers.forEach(n => {
-        const chip = document.createElement('span');
-        chip.className = 'lottery-chip' + (n === d.winningNumber ? ' hit' : '');
-        chip.textContent = n;
-        box.appendChild(chip);
-      });
+	  box.innerHTML = '';
+	  d.drawnNumbers.forEach(n => {
+		const chip = document.createElement('span');
+		chip.className = 'lottery-chip' + (n === d.winningNumber ? ' hit' : '');
+		chip.textContent = n;
+		box.appendChild(chip);
+	  });
 
-      if (d.isWon === 1) {
-        prizeBanner.style.display = 'block';
-        prizeName.textContent = d.awardedEvent;
-      } else {
-        prizeBanner.style.display = 'none';
-      }
+	  if (d.isWon === 1) {
+		prizeBanner.style.display = 'block';
+		prizeName.textContent = d.awardedEvent;
+	  } else {
+		prizeBanner.style.display = 'none';
+	  }
 
-      modal.style.display = 'flex';
-    }
+	  modal.style.display = 'flex';
+	}
 
     function proceedAfterLottery() {
       document.getElementById('lotteryResultModal').style.display = 'none';
