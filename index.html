@@ -461,13 +461,15 @@
     }
     .q-counter { font-weight: 800; font-size: 0.95rem; color: var(--secondary); }
     .q-content {
-	  font-size: 1.08rem;
+	  font-size: 1.12rem;
 	  font-weight: 700;
 	  color: #0f172a;
 	  line-height: 1.6;
 	  margin-bottom: 18px;
 	  white-space: pre-wrap;
 	  word-break: break-word;
+	  font-family: 'Consolas', 'Roboto Mono', 'Fira Code', 'Courier New', monospace;
+}
 	}
 	
 	.python-code-box {
@@ -1843,47 +1845,47 @@
     }
 
     function renderQuiz(questions) {
-      const container = document.getElementById('questionsScrollContainer');
-      container.innerHTML = '';
-      Object.keys(userAnswers).forEach(key => delete userAnswers[key]);
+	  const container = document.getElementById('questionsScrollContainer');
+	  container.innerHTML = '';
+	  Object.keys(userAnswers).forEach(key => delete userAnswers[key]);
 
-      updateProgressBar(0, questions.length);
+	  updateProgressBar(0, questions.length);
 
-      const letters = ['A', 'B', 'C', 'D'];
-      questions.forEach((q, qIndex) => {
-        const card = document.createElement('div');
-        card.className = 'question-card';
-        card.id = `qCard_${qIndex}`;
+	  const letters = ['A', 'B', 'C', 'D'];
+	  questions.forEach((q, qIndex) => {
+		const card = document.createElement('div');
+		card.className = 'question-card';
+		card.id = `qCard_${qIndex}`;
 
-        let optionsHtml = '';
-        q.options.forEach((optRaw, optIdx) => {
-          const letter = letters[optIdx];
-          const optText = getOptionText(optRaw);
+		let optionsHtml = '';
+		q.options.forEach((optRaw, optIdx) => {
+		  const letter = letters[optIdx];
+		  const optText = getOptionText(optRaw);
 
-          optionsHtml += `
-            <div class="option-item" onclick="selectOption(${qIndex}, '${letter}', this)">
-              <div class="option-circle">${letter}</div>
-              <div class="option-text">${escapeHtml(optText)}</div>
-            </div>
-          `;
-        });
+		  optionsHtml += `
+			<div class="option-item" onclick="selectOption(${qIndex}, '${letter}', this)">
+			  <div class="option-circle">${letter}</div>
+			  <div class="option-text">${escapeHtml(optText)}</div>
+			</div>
+		  `;
+		});
 
-        card.innerHTML = `
-          <div class="q-meta">
-            <span class="q-category-tag">📂 ${escapeHtml(q.category)}</span>
-            <span class="q-counter">第 ${qIndex + 1} 題 / 共 ${questions.length} 題</span>
-          </div>
-          <div class="q-content">${formatPythonQuestion(q.question)}</div>
-          <div class="options-list">${optionsHtml}</div>
-        `;
-        container.appendChild(card);
-      });
+		card.innerHTML = `
+		  <div class="q-meta">
+			<span class="q-category-tag">📂 ${escapeHtml(q.category)}</span>
+			<span class="q-counter">第 ${qIndex + 1} 題 / 共 ${questions.length} 題</span>
+		  </div>
+		  <div class="q-content">${formatPythonQuestion(q.question)}</div>
+		  <div class="options-list">${optionsHtml}</div>
+		`;
+		container.appendChild(card);
+	  });
 
-      document.getElementById('setupView').style.display = 'none';
-      document.getElementById('mistakeBankView').style.display = 'none';
-      document.getElementById('quizView').style.display = 'block';
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    }
+	  document.getElementById('setupView').style.display = 'none';
+	  document.getElementById('mistakeBankView').style.display = 'none';
+	  document.getElementById('quizView').style.display = 'block';
+	  window.scrollTo({ top: 0, behavior: 'smooth' });
+	}
 
     function selectOption(qIndex, letter, elem) {
       userAnswers[qIndex] = letter;
@@ -2574,46 +2576,26 @@
         .replace(/'/g, "&#039;");
     }
 	
-	// 自動將題幹中的單行代碼與分號轉化為標準 PEP 8 多行縮排代碼塊
+	// 自動將單行代碼與分號轉化為標準多行與縮排排版
 	function formatPythonQuestion(rawText) {
 	  if (!rawText) return '';
+	  var text = String(rawText);
 
-	  // 1. 若題目已經帶有換行符號（來自清洗後的 Google Sheet）
-	  // 檢測是否包含 Python 代碼特徵
-	  const codeKeywords = /(for\s|while\s|if\s|def\s|print\(\vert{}import\s)/;      // 針對用分號 ; 或單行寫在一起的題目，進行智能正規劃拆行與縮排   let formatted = rawText;    // 拆解常見的單行多語句 (例如: a = 10; b = 20; print(...))   if (formatted.includes(';') && (formatted.includes('print') \vert{}\vert{} formatted.includes('='))) {     formatted = formatted.replace(/;\s*/g, '\n');   }    // 拆解單行 if-else (例如: if 0: print("True") else: print("False"))   formatted = formatted.replace(/:\s*(print\([^\)]+\)|pass|continue|break)\s+else:/g, ':\n    $1\nelse:');
-	  formatted = formatted.replace(/else:\s*(print\([^\)]+\)|pass)/g, 'else:\n    $1');
-
-	  // 拆解單行 for / while 複合語句 (例如: for i in range(5): if i == 2: continue)
-	  formatted = formatted.replace(/(for\s+[^:]+:)\s*(if\s+[^:]+:)/g, '$1\n    $2');
-	  formatted = formatted.replace(/(if\s+[^:]+:)\s*(continue|break|pass)/g, '$1\n        $2');
-	  formatted = formatted.replace(/(continue|break|pass)\n/g, '$1\n    ');
-
-	  // 如果題目本身有換行，將代碼段落自動包裹在代碼框中
-	  if (formatted.includes('\n')) {
-		// 區分題目前言、代碼區塊與結尾提問
-		const lines = formatted.split('\n');
-		let intro = '';
-		let codeLines = [];
-		let outro = '';
-
-		lines.forEach((line, idx) => {
-		  const trimmed = line.trim();
-		  if (idx === 0 && (trimmed.startsWith('代碼') || trimmed.startsWith('執行代碼') || trimmed.startsWith('設'))) {
-			// 第一行如果包含簡介
-			intro = line;
-		  } else if (trimmed.endsWith('？') || trimmed.endsWith('：') || trimmed.startsWith('其輸出') || trimmed.startsWith('輸出為何')) {
-			outro = line;
-		  } else {
-			codeLines.push(line);
-		  }
-		});
-
-		if (codeLines.length > 0) {
-		  return `${escapeHtml(intro)}<pre class="python-code-box"><code>${escapeHtml(codeLines.join('\n'))}</code></pre>${escapeHtml(outro)}`;
-		}
+	  // 1. 若題目以分號 ; 串接多個語句，自動轉為換行
+	  if (text.indexOf(';') !== -1 && (text.indexOf('print') !== -1 || text.indexOf('=') !== -1 || text.indexOf('while') !== -1 || text.indexOf('for') !== -1 || text.indexOf('pass') !== -1)) {
+		text = text.replace(/;\s*/g, '\n');
 	  }
 
-	  return escapeHtml(formatted);
+	  // 2. 處理單行 if-else 語句（如 if 0: print(...) else: ...）
+	  text = text.replace(/:\s*(print\([^\)]+\)|pass|continue|break)\s+else:/g, ':\n    $1\nelse:');
+	  text = text.replace(/else:\s*(print\([^\)]+\)|pass)/g, 'else:\n    $1');
+
+	  // 3. 處理單行 for / while 複合語句（如 for ...: if ...:）
+	  text = text.replace(/(for\s+[^:]+:)\s*(if\s+[^:]+:)/g, '$1\n    $2');
+	  text = text.replace(/(if\s+[^:]+:)\s*(continue|break|pass)/g, '$1\n        $2');
+
+	  // 4. 安全轉義 HTML 字元，同時保留 \n 換行與縮排空格
+	  return escapeHtml(text);
 	}
 	
   </script>
