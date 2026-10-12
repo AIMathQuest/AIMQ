@@ -55,6 +55,26 @@
       padding: 0 16px 80px 16px;
     }
 
+    /* 需求 1：頂部慶典加乘高亮光暈橫幅 */
+    .festival-banner {
+      display: none;
+      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+      color: #ffffff;
+      text-align: center;
+      padding: 12px 18px;
+      border-radius: 16px;
+      font-weight: 800;
+      font-size: 1.05rem;
+      margin-bottom: 20px;
+      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
+      animation: festivalPulse 2.5s infinite;
+    }
+    @keyframes festivalPulse {
+      0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+      70% { box-shadow: 0 0 0 12px rgba(245, 158, 11, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+    }
+
     .header-area {
       text-align: center;
       margin-bottom: 20px;
@@ -772,13 +792,13 @@
     </div>
   </div>
 
-  <!-- 特殊類：心想事成自選 Modal (需求 3：黃色高亮樣式 + 🍀) -->
+  <!-- 特殊類：心想事成自選 Modal (需求 5：新增「增益：知識的共鳴」) -->
   <div id="wishesModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
       <div style="font-size: 3.5rem; margin-bottom: 8px;">🍀</div>
       <h3 style="font-size: 1.4rem; font-weight: 900; margin-bottom: 6px;">心想事成！</h3>
       <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">
-        恭喜獲得特別事件！請在以下三者中指定一項獲得：
+        恭喜獲得特別事件！請在以下四者中指定一項獲得：
       </p>
 
       <div id="wishOptionsContainer" style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; text-align: left;">
@@ -793,6 +813,10 @@
         <div class="wish-item" onclick="selectWish('more', this)">
           <div class="wish-circle">🤪</div>
           <div class="wish-text"><b>技能：多多益善</b><br><span style="font-size:0.85rem; color:#475569;">鎖定對方下一次練習必須挑戰 60 道題目</span></div>
+        </div>
+        <div class="wish-item" onclick="selectWish('knowledge', this)">
+          <div class="wish-circle">📖</div>
+          <div class="wish-text"><b>增益：知識的共鳴</b><br><span style="font-size:0.85rem; color:#475569;">引起知識的共鳴與老師的注意，下一次測驗將獲加分！（可累加）</span></div>
         </div>
       </div>
 
@@ -826,20 +850,48 @@
     </div>
   </div>
 
-  <!-- 待觸發事件/狀態通知 Modal -->
+  <!-- 待觸發事件/狀態通知 Modal (需求 2 & 3: 帶確認後自動清除後台記錄防重複) -->
   <div id="pendingNoticeModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
       <div style="font-size: 3.2rem; margin-bottom: 8px;" id="noticeIcon">📬</div>
       <h3 id="noticeTitle" style="font-size: 1.35rem; font-weight: 900; margin-bottom: 8px;"></h3>
       <div id="noticeContent" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 22px; text-align: left; background: #f8fafc; padding: 16px; border-radius: 14px; border: 1.5px solid #e2e8f0;"></div>
       
-      <div id="noticeBtnArea" style="display:flex; gap:12px;">
-        <button id="btnNoticeConfirm" class="btn-campus" onclick="dismissPendingNotice()">我知道了</button>
+      <div id="noticeBtnArea" style="display:flex; gap:12px;"></div>
+    </div>
+  </div>
+
+  <!-- 需求 7：重置個人錯題庫 Modal -->
+  <div id="resetMistakeModal" class="modal-overlay">
+    <div class="modal-card">
+      <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
+        🔄 重置個人錯題庫
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+        請勾選欲清空錯題記錄的課題（可多選）：
+      </p>
+
+      <div style="display: flex; justify-content: flex-end; margin-bottom: 10px;">
+        <button type="button" class="btn-group-toggle" onclick="toggleSelectAllResetMistakes()">全選 / 取消</button>
+      </div>
+
+      <div id="resetMistakeCategoryGrid" class="group-items-grid" style="max-height: 240px; overflow-y: auto; margin-bottom: 20px;">
+        <!-- 動態載入含有錯題的課題 -->
+      </div>
+
+      <div style="display: flex; gap: 12px;">
+        <button class="btn-campus" style="background: #e2e8f0; color: #334155; box-shadow: none;" onclick="closeResetMistakeModal()">取消</button>
+        <button class="btn-campus" style="background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);" onclick="handleConfirmResetMistakes()">確認重置選定課題</button>
       </div>
     </div>
   </div>
 
   <div class="app-container">
+    <!-- 需求 1：慶典加乘頂部橫幅 -->
+    <div id="festivalBanner" class="festival-banner">
+      🎉 慶典進行中，目前抽獎加乘倍數：<span id="festivalMultiplierVal">1</span> 倍！
+    </div>
+
     <div class="header-area">
       <h1 class="brand-title">AIMathQuest</h1>
       <p class="brand-subtitle">自主學習・即時診斷・遊戲互動</p>
@@ -874,7 +926,7 @@
     <!-- 步驟 1：客製設定介面 -->
     <div id="setupView" class="campus-card" style="display: none;">
       <div class="user-hud-bar">
-        <!-- 需求 1：手動呼喚「模式控制面板」按鈕 (僅教師顯示) -->
+        <!-- 教師專用模式控制面板按鈕 -->
         <button id="btnTeacherPanelShortcut" class="btn-teacher-panel-badge" style="display:none;" onclick="openTeacherControlPanelWindow()" title="開啟教師專用模式控制面板">
           🎛️ 模式控制面板
         </button>
@@ -914,7 +966,32 @@
         </div>
       </div>
 
-      <button id="btnStart" class="btn-campus" onclick="handleStartQuiz()">🚀 隨機生成題目</button>
+      <div style="display: flex; gap: 14px;">
+        <button id="btnStart" class="btn-campus" style="flex: 2;" onclick="handleStartQuiz()">🚀 隨機生成題目</button>
+        <!-- 需求 7：個人錯題庫跳轉按鈕 -->
+        <button id="btnOpenMistakes" class="btn-campus" style="flex: 1; background: linear-gradient(135deg, #475569 0%, #334155 100%); box-shadow: 0 4px 12px rgba(51, 65, 85, 0.25);" onclick="openMistakeBankView()">📖 個人錯題庫</button>
+      </div>
+    </div>
+
+    <!-- 步驟 1.5：個人錯題庫重溫頁面 (需求 7) -->
+    <div id="mistakeBankView" style="display: none;">
+      <div class="campus-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--border-color); padding-bottom: 14px; margin-bottom: 18px;">
+          <div>
+            <h2 style="font-size: 1.45rem; font-weight: 800; color: #0f172a;">📖 個人錯題庫重溫</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">歷史答錯題目、正解與說明複習專區</p>
+          </div>
+          <button class="btn-campus" style="width: auto; padding: 10px 18px; font-size: 0.9rem; background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%); box-shadow: none;" onclick="openResetMistakeModal()">🔄 重置錯題庫</button>
+        </div>
+
+        <div id="mistakeCardsContainer">
+          <div style="text-align: center; color: var(--text-muted); padding: 40px;">正在讀取錯題庫記錄...</div>
+        </div>
+
+        <div style="margin-top: 26px;">
+          <button class="btn-campus" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);" onclick="closeMistakeBankView()">🔙 返回自定義練習</button>
+        </div>
+      </div>
     </div>
 
     <!-- 步驟 2：作答頁面 -->
@@ -963,7 +1040,7 @@
       </div>
 
       <div id="wrongSection">
-        <h3 style="font-size: 1.15rem; font-weight: 800; color: #1e293b; margin-bottom: 14px;">🔍 錯題診斷與詳解</h3>
+        <h3 style="font-size: 1.15rem; font-weight: 800; color: #1e293b; margin-bottom: 14px;">🔍 本次練習錯題診斷與詳解</h3>
         <div id="wrongListContainer"></div>
       </div>
 
@@ -984,7 +1061,7 @@
     let userAuthToken = '';
     let currentUserProfile = null;
     let currentExamConfig = null;
-    let availableAvatars = []; // 延遲按需加載快取
+    let availableAvatars = [];
     let selectedAvatarStyle = '';
 
     let currentQuizData = [];
@@ -998,6 +1075,9 @@
     let activeLotteryData = null;
     let activePendingQueue = [];
     let currentActionType = '';
+
+    // 個人錯題庫快取數據
+    let currentMistakeBankData = null;
 
     const GROUP_DEFINITIONS = [
       {
@@ -1092,7 +1172,7 @@
       animate();
     })();
 
-    /* ================= 2. API 通訊與身份校驗 (登入極速優化) ================= */
+    /* ================= 2. API 通訊與身份校驗 ================= */
     async function callGasApi(action, data = {}) {
       const response = await fetch(GAS_API_URL, {
         method: 'POST',
@@ -1132,7 +1212,7 @@
         applyExamConfigUI(currentExamConfig);
         renderGroupedCategories(res.categories);
 
-        // 需求 1：若為教師，顯示按鈕，不再自動彈窗！
+        // 教師顯示按鈕，不再自動彈窗
         if (currentUserProfile.isTeacher) {
           document.getElementById('btnTeacherPanelShortcut').style.display = 'inline-flex';
         }
@@ -1184,11 +1264,21 @@
       }
     }
 
+    // 需求 1：慶典橫幅判定顯示
     function applyExamConfigUI(config) {
       const modeInput = document.getElementById('examRoomInput');
       const modeLabel = document.getElementById('examRoomLabel');
       const slider = document.getElementById('countSlider');
       const sliderVal = document.getElementById('sliderValue');
+
+      // 慶典加乘橫幅 (若 A5 不是 1 則顯示)
+      const festivalBanner = document.getElementById('festivalBanner');
+      if (config.lotteryMultiplier && config.lotteryMultiplier !== 1 && config.lotteryMultiplier > 1) {
+        document.getElementById('festivalMultiplierVal').textContent = config.lotteryMultiplier;
+        festivalBanner.style.display = 'block';
+      } else {
+        festivalBanner.style.display = 'none';
+      }
 
       if (config.isExamMode) {
         modeInput.value = config.examName;
@@ -1219,7 +1309,7 @@
       }
     }
 
-    /* ================= 3. 教師專屬：模式控制面板新網頁 (手動呼喚) ================= */
+    /* ================= 3. 教師專屬：模式控制面板 ================= */
     function openTeacherControlPanelWindow() {
       const panelWin = window.open('', '_blank', 'width=980,height=820');
       if (!panelWin) {
@@ -1404,7 +1494,7 @@
       panelWin.document.close();
     }
 
-    /* ================= 4. 頭像與個人設定面板 (延遲載入) ================= */
+    /* ================= 4. 頭像與個人設定面板 ================= */
     async function openProfileModal(isMandatory = false) {
       const modal = document.getElementById('profileModal');
       const cancelBtn = document.getElementById('btnCancelProfile');
@@ -1426,7 +1516,6 @@
 
       modal.style.display = 'flex';
 
-      // 需求 2：延遲按需加載 20 款頭像 (若尚未加載過)
       if (availableAvatars.length === 0) {
         try {
           const res = await callGasApi('getAvatars');
@@ -1746,6 +1835,7 @@
       });
 
       document.getElementById('setupView').style.display = 'none';
+      document.getElementById('mistakeBankView').style.display = 'none';
       document.getElementById('quizView').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1766,7 +1856,158 @@
       document.getElementById('energyBarFill').style.width = `${percent}%`;
     }
 
-    /* ================= 7. 交卷、抽獎與事件判定鏈條 ================= */
+    /* ================= 7. 個人錯題庫系統 (需求 7) ================= */
+    async function openMistakeBankView() {
+      document.getElementById('setupView').style.display = 'none';
+      document.getElementById('mistakeBankView').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      showLoading(true, '📖 正在檢索歷史個人錯題記錄...');
+      try {
+        const res = await callGasApi('getMistakeBank');
+        showLoading(false);
+        currentMistakeBankData = res.data;
+        renderMistakeCards(res.data);
+      } catch (err) {
+        showLoading(false);
+        alert('加載個人錯題庫失敗：' + err.message);
+      }
+    }
+
+    function closeMistakeBankView() {
+      document.getElementById('mistakeBankView').style.display = 'none';
+      document.getElementById('setupView').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderMistakeCards(data) {
+      const container = document.getElementById('mistakeCardsContainer');
+      container.innerHTML = '';
+
+      if (!data || !data.questions || data.questions.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding: 40px 20px; color: var(--success);">
+            <div style="font-size:3.5rem; margin-bottom:12px;">🌟</div>
+            <h3 style="font-size:1.3rem; font-weight:800;">暫無錯題記錄！</h3>
+            <p style="color:var(--text-muted); font-size:0.95rem; margin-top:6px;">您目前的學習掌握度極佳，繼續保持！</p>
+          </div>
+        `;
+        return;
+      }
+
+      const letters = ['A', 'B', 'C', 'D'];
+      data.questions.forEach((q, idx) => {
+        const card = document.createElement('div');
+        card.className = 'wrong-item';
+
+        let optionsHtml = '<div class="review-options-container">';
+        letters.forEach((letter, oIdx) => {
+          const optText = getOptionText(q.options ? q.options[oIdx] : '');
+          const isCorrect = (letter === q.correctAnswer);
+          let optClass = 'review-opt';
+          let flagHtml = '';
+
+          if (isCorrect) {
+            optClass += ' opt-correct';
+            flagHtml = '<span class="review-flag flag-correct">✅ 正確答案</span>';
+          }
+
+          optionsHtml += `
+            <div class="${optClass}">
+              <div class="review-circle">${letter}</div>
+              <div class="review-text">${escapeHtml(optText)}</div>
+              ${flagHtml}
+            </div>
+          `;
+        });
+        optionsHtml += '</div>';
+
+        card.innerHTML = `
+          <div style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 6px;">
+            [${escapeHtml(q.category)}] 題號：${escapeHtml(q.id)}
+          </div>
+          <div style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; line-height: 1.5;">
+            ${escapeHtml(q.question)}
+          </div>
+          ${optionsHtml}
+          <div class="explanation-container">
+            💡 <b>題目解析：</b><br>${escapeHtml(q.explanation)}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function openResetMistakeModal() {
+      if (!currentMistakeBankData || !currentMistakeBankData.categories || currentMistakeBankData.categories.length === 0) {
+        alert('目前沒有任何課題存在錯題，無需重置！');
+        return;
+      }
+
+      const grid = document.getElementById('resetMistakeCategoryGrid');
+      grid.innerHTML = '';
+
+      currentMistakeBankData.categories.forEach(cat => {
+        const chip = document.createElement('label');
+        chip.className = 'category-chip active';
+        chip.innerHTML = `
+          <input type="checkbox" name="resetCatCheck" value="${escapeHtml(cat)}" checked>
+          <span>${escapeHtml(cat)}</span>
+        `;
+        chip.addEventListener('click', () => {
+          setTimeout(() => {
+            const isChecked = chip.querySelector('input').checked;
+            chip.classList.toggle('active', isChecked);
+          }, 10);
+        });
+        grid.appendChild(chip);
+      });
+
+      document.getElementById('resetMistakeModal').style.display = 'flex';
+    }
+
+    function closeResetMistakeModal() {
+      document.getElementById('resetMistakeModal').style.display = 'none';
+    }
+
+    function toggleSelectAllResetMistakes() {
+      const inputs = document.querySelectorAll('input[name="resetCatCheck"]');
+      const allChecked = Array.from(inputs).every(i => i.checked);
+      inputs.forEach(i => {
+        i.checked = !allChecked;
+        const label = i.closest('.category-chip');
+        if (label) label.classList.toggle('active', !allChecked);
+      });
+    }
+
+    async function handleConfirmResetMistakes() {
+      const checkedBoxes = document.querySelectorAll('input[name="resetCatCheck"]:checked');
+      const selectedCats = Array.from(checkedBoxes).map(cb => cb.value);
+
+      if (selectedCats.length === 0) {
+        alert('請至少勾選一個欲重置的課題！');
+        return;
+      }
+
+      if (!confirm(`確定要清除選定的 ${selectedCats.length} 個課題的錯題記錄嗎？`)) {
+        return;
+      }
+
+      showLoading(true, '🔄 正在同步重置錯題記錄...');
+      try {
+        const res = await callGasApi('resetMistakeBank', { categories: selectedCats });
+        showLoading(false);
+        alert(res.message || '重置成功！');
+        closeResetMistakeModal();
+        openMistakeBankView(); // 刷新錯題頁面
+      } catch (err) {
+        showLoading(false);
+        alert('重置失敗：' + err.message);
+      }
+    }
+
+    /* ================= 8. 交卷、抽獎與事件判定鏈條 ================= */
     async function handleSubmitQuizWithRetry() {
       const total = currentQuizData.length;
       const answeredCount = Object.keys(userAnswers).length;
@@ -2039,7 +2280,7 @@
       }
     }
 
-    /* 需求 3：「心想事成」選擇事件點選轉亮黃色 */
+    /* 需求 3 & 5：「心想事成」自選黃色高亮樣式 + 知識的共鳴 */
     let chosenWish = 'meteor';
     function openWishesModal() {
       document.getElementById('wishesModal').style.display = 'flex';
@@ -2049,11 +2290,27 @@
       document.querySelectorAll('#wishOptionsContainer .wish-item').forEach(el => el.classList.remove('selected'));
       if (elem) elem.classList.add('selected');
     }
-    function handleConfirmWish() {
+    async function handleConfirmWish() {
       document.getElementById('wishesModal').style.display = 'none';
-      if (chosenWish === 'meteor') openInteractiveActionModal('meteor');
-      else if (chosenWish === 'megaphone') openInteractiveActionModal('megaphone');
-      else if (chosenWish === 'more') openInteractiveActionModal('more_the_merrier');
+      if (chosenWish === 'meteor') {
+        openInteractiveActionModal('meteor');
+      } else if (chosenWish === 'megaphone') {
+        openInteractiveActionModal('megaphone');
+      } else if (chosenWish === 'more') {
+        openInteractiveActionModal('more_the_merrier');
+      } else if (chosenWish === 'knowledge') {
+        // 增益：知識的共鳴 (作用於自身)
+        showLoading(true, '📖 正在與知識產生共鳴...');
+        try {
+          const res = await callGasApi('triggerGameEvent', { eventType: 'knowledge_resonance' });
+          showLoading(false);
+          alert(res.message || '知識的共鳴已成功觸發！');
+          processNextPendingNotice();
+        } catch (err) {
+          showLoading(false);
+          alert('觸發失敗：' + err.message);
+        }
+      }
     }
 
     function openInteractiveActionModal(type, prefillClass = '', prefillName = '') {
@@ -2131,6 +2388,7 @@
       }
     }
 
+    // 需求 2 & 3：確認閱讀後自動向後台清空記錄，杜絕重複提醒
     function processNextPendingNotice() {
       if (activePendingQueue.length === 0) return;
       const item = activePendingQueue.shift();
@@ -2150,6 +2408,8 @@
         replyBtn.textContent = '✍️ 回應「眾裡尋他傳聲筒」';
         replyBtn.onclick = () => {
           modal.style.display = 'none';
+          // 確認收到並銷毀
+          callGasApi('clearUserNotice', { noticeType: 'megaphone' });
           openInteractiveActionModal('lookback', item.replyToClass, item.replyToName);
         };
         btnArea.appendChild(replyBtn);
@@ -2161,6 +2421,7 @@
         skipBtn.textContent = '不回應';
         skipBtn.onclick = () => {
           modal.style.display = 'none';
+          callGasApi('clearUserNotice', { noticeType: 'megaphone' });
           processNextPendingNotice();
         };
         btnArea.appendChild(skipBtn);
@@ -2170,6 +2431,9 @@
         okBtn.textContent = '我知道了';
         okBtn.onclick = () => {
           modal.style.display = 'none';
+          if (item.type === 'lookback') {
+            callGasApi('clearUserNotice', { noticeType: 'lookback' });
+          }
           processNextPendingNotice();
         };
         btnArea.appendChild(okBtn);
