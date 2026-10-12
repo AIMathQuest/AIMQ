@@ -1204,7 +1204,7 @@
       const allCats = cfg.allConfigCategories || GROUP_DEFINITIONS.flatMap(g => g.items);
       const lockedCats = cfg.lockedCategories || [];
       const currentIsOpen = cfg.isExamMode ? 1 : 0;
-      const currentExamName = cfg.examName !== '日常練習' ? cfg.examName : '第1段數學AI能力測驗';
+      const currentExamName = cfg.examName !== '日常練習' ? cfg.examName : '第1段S1A數學AI測評1';
       const currentQCount = cfg.questionCount > 0 ? cfg.questionCount : 30;
       const currentMultiplier = cfg.lotteryMultiplier || 1;
 
@@ -1259,13 +1259,13 @@
 <body>
   <div class="panel-container">
     <div class="panel-header">
-      <div class="panel-title">🎛️ AIMathQuest 模式控制面板</div>
-      <div class="panel-badge">教師組別專屬後台</div>
+      <div class="panel-title">🎛️ AIMQ模式控制面板</div>
+      <div class="panel-badge">教師專屬</div>
     </div>
 
     <!-- A2: 開啟/關閉 iOS 切換 -->
     <div class="form-item">
-      <label class="form-label">⚙️ A2 格子：測驗模式狀態 (開啟 / 關閉)</label>
+      <label class="form-label">⚙️ 測驗模式</label>
       <div class="ios-switch-box">
         <label class="ios-switch">
           <input type="checkbox" id="switchExamMode" ${currentIsOpen ? 'checked' : ''} onchange="updateSwitchText()">
@@ -1277,13 +1277,13 @@
 
     <!-- B2: 測驗名稱 -->
     <div class="form-item">
-      <label class="form-label" for="txtExamName">📝 B2 格子：測驗名稱</label>
+      <label class="form-label" for="txtExamName">📝 測驗名稱</label>
       <input type="text" id="txtExamName" class="input-dark" value="${escapeHtml(currentExamName)}" placeholder="例如：第一段S1A數學AI測評1">
     </div>
 
     <!-- C2: 題目數量 (10~60 題) -->
     <div class="form-item">
-      <label class="form-label">🎯 C2 格子：測驗題目數量 (10 ~ 60 題)</label>
+      <label class="form-label">🎯 測驗題目數量</label>
       <div class="range-box">
         <input type="range" id="rangeQCount" class="slider-dark" min="10" max="60" step="5" value="${currentQCount}" oninput="document.getElementById('valQCount').textContent = this.value + ' 題'">
         <div id="valQCount" class="slider-val-badge">${currentQCount} 題</div>
@@ -1292,7 +1292,7 @@
 
     <!-- D2往右格子：選擇課題 (矩陣多選) -->
     <div class="form-item">
-      <label class="form-label">📚 D2 往右格子：考核課題選擇 (矩陣多選打勾)</label>
+      <label class="form-label">📚 課題選擇</label>
       <div class="matrix-grid" id="categoryMatrixBox">
         ${allCats.map(cat => `
           <label class="matrix-item ${lockedCats.includes(cat) ? 'checked' : ''}" onclick="toggleMatrixClass(this)">
@@ -1305,11 +1305,11 @@
 
     <!-- A5: 抽獎加乘倍率 -->
     <div class="form-item">
-      <label class="form-label" for="numMultiplier">🎁 A5 格子：幸運抽獎加乘倍率係數</label>
+      <label class="form-label" for="numMultiplier">🎁 幸運大抽獎加乘倍率</label>
       <input type="number" id="numMultiplier" class="input-dark" min="1" max="100" step="1" value="${currentMultiplier}" placeholder="預設：1">
     </div>
 
-    <button class="btn-submit-panel" onclick="savePanelSettings()">⚡ 設置！(更新自定義模式分頁)</button>
+    <button class="btn-submit-panel" onclick="savePanelSettings()">⚡ 立即設置</button>
   </div>
 
   <script>
@@ -1372,7 +1372,7 @@
       } catch (err) {
         alert('傳輸失敗：' + err.message);
       } finally {
-        btn.textContent = '⚡ 設置！(更新自定義模式分頁)';
+        btn.textContent = '⚡ 立即設置';
         btn.disabled = false;
       }
     }
