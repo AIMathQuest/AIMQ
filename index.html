@@ -79,6 +79,7 @@
       justify-content: flex-end;
       align-items: center;
       margin-bottom: 16px;
+      gap: 10px;
     }
 
     .hud-pill {
@@ -153,6 +154,27 @@
       white-space: pre-line;
       line-height: 1.25;
       text-align: left;
+    }
+
+    /* 教師專屬面板快捷鍵 */
+    .btn-teacher-panel-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      color: #38bdf8;
+      border: 1.5px solid #38bdf8;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+      transition: all 0.2s;
+    }
+    .btn-teacher-panel-badge:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(56, 189, 248, 0.35);
     }
 
     .campus-card {
@@ -700,11 +722,11 @@
     </div>
   </div>
 
-  <!-- 隨機抽獎揭曉 Modal -->
+  <!-- 隨機抽獎揭曉 Modal (改用 🎁 禮物 emoji) -->
   <div id="lotteryResultModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
-      <div id="lotteryIcon" style="font-size: 3.5rem; margin-bottom: 8px;">🎰</div>
-      <h3 id="lotteryModalTitle" style="font-size: 1.4rem; font-weight: 900; margin-bottom: 8px;">抽獎結果揭曉</h3>
+      <div id="lotteryIcon" style="font-size: 3.5rem; margin-bottom: 8px;">🎁</div>
+      <h3 id="lotteryModalTitle" style="font-size: 1.4rem; font-weight: 900; margin-bottom: 8px;">幸運大抽獎揭曉</h3>
       <div id="lotteryModalDesc" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 12px;"></div>
       
       <div id="lotteryNumbersBox" class="lottery-nums-container"></div>
@@ -718,10 +740,10 @@
     </div>
   </div>
 
-  <!-- 特殊類：心想事成自選 Modal -->
+  <!-- 特殊類：心想事成自選 Modal (使用 🍀) -->
   <div id="wishesModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
-      <div style="font-size: 3.5rem; margin-bottom: 8px;">✨</div>
+      <div style="font-size: 3.5rem; margin-bottom: 8px;">🍀</div>
       <h3 style="font-size: 1.4rem; font-weight: 900; margin-bottom: 6px;">心想事成！</h3>
       <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 20px;">
         恭喜獲得特別事件！請在以下三者中指定一項獲得：
@@ -731,17 +753,17 @@
         <label class="option-item" onclick="selectWish('meteor')">
           <input type="radio" name="wishRadio" value="meteor" checked style="display:none;">
           <div class="option-circle">1</div>
-          <div class="option-text"><b>事件：流星雨下的祝福</b>（下一次雙雙倍經驗）</div>
+          <div class="option-text"><b>🌠 事件：流星雨下的祝福</b>（下一次雙倍經驗值入庫）</div>
         </label>
         <label class="option-item" onclick="selectWish('megaphone')">
           <input type="radio" name="wishRadio" value="megaphone" style="display:none;">
           <div class="option-circle">2</div>
-          <div class="option-text"><b>道具：眾裡尋他傳聲筒</b>（傳遞訊息並解鎖回聲）</div>
+          <div class="option-text"><b>💬 道具：眾裡尋他傳聲筒</b>（傳遞訊息並解鎖回聲）</div>
         </label>
         <label class="option-item" onclick="selectWish('more')">
           <input type="radio" name="wishRadio" value="more" style="display:none;">
           <div class="option-circle">3</div>
-          <div class="option-text"><b>技能：多多益善</b>（鎖定對方下次做 60 題）</div>
+          <div class="option-text"><b>🤪 技能：多多益善</b>（鎖定對方下次做 60 題）</div>
         </label>
       </div>
 
@@ -823,6 +845,11 @@
     <!-- 步驟 1：客製設定介面 -->
     <div id="setupView" class="campus-card" style="display: none;">
       <div class="user-hud-bar">
+        <!-- 若為教師組別，顯示專屬模式控制面板快捷按鈕 -->
+        <button id="btnTeacherPanelShortcut" class="btn-teacher-panel-badge" style="display:none;" onclick="openTeacherControlPanelWindow()" title="開啟教師專用模式控制面板">
+          🎛️ 模式控制面板
+        </button>
+
         <div class="hud-pill">
           <div class="hud-avatar-slot" onclick="openProfileModal(false)" title="點選更換頭像與暱稱">
             <img id="hudAvatarImg" src="" alt="Avatar">
@@ -888,7 +915,6 @@
         </div>
         <h2 id="resultTitle" style="font-size: 1.6rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">提交完成！</h2>
         
-        <!-- 流星雨祝福雙倍經驗特殊提示 -->
         <div id="meteorExpBanner" style="display:none; background:#fef3c7; border:1.5px solid #f59e0b; color:#b45309; padding:8px 16px; border-radius:999px; font-weight:800; font-size:0.95rem; margin-bottom:12px; display:inline-block;">
           🌠【流星雨下的祝福】生效！本次答對題數與課題表現以雙倍（x2）累記入庫！
         </div>
@@ -1051,15 +1077,12 @@
       return resJson;
     }
 
-    /**
-     * 判定當前是否處於多多益善效果限制 (練習模式下生效)
-     */
     function isMoreTheMerrierActive() {
       const isExam = currentExamConfig && currentExamConfig.isExamMode;
       if (isExam) return false;
       if (!currentUserProfile) return false;
-      const val = currentUserProfile.moreIsMerrierActive;
-      return val === '1' || val === 1 || String(val).trim() === '1';
+      const val = String(currentUserProfile.moreIsMerrierActive).trim().toLowerCase();
+      return (val === '1' || val === 'true' || val === '是');
     }
 
     async function handleCredentialResponse(response) {
@@ -1081,7 +1104,12 @@
         applyExamConfigUI(currentExamConfig);
         renderGroupedCategories(res.categories);
 
-        // 登入時檢查多多益善狀態
+        // 需求 4：若為教師組別，顯示快捷按鈕並在新網頁彈出「模式控制面板」
+        if (currentUserProfile.isTeacher) {
+          document.getElementById('btnTeacherPanelShortcut').style.display = 'inline-flex';
+          openTeacherControlPanelWindow();
+        }
+
         checkMoreTheMerrierOnLogin();
 
         if (currentUserProfile.isFirstTime || !currentUserProfile.nickname) {
@@ -1120,7 +1148,7 @@
 
         showPendingNotice(
           '📜 技能生效提醒：多多益善',
-          '💪',
+          '🤪',
           `您受到了來自【<b>${escapeHtml(sender)}</b>】的技能「<b>多多益善</b>」鼓勵！<br><br>` +
           `📌 <b>限制：</b>本次練習強制鎖定必須選擇 <b>60 題</b>。<br>` +
           `🔓 <b>解除方式：</b>在日常練習模式下完整完成 60 題作答並交卷，方可解除此效果！`,
@@ -1164,7 +1192,201 @@
       }
     }
 
-    /* ================= 3. 頭像與個人設定面板 ================= */
+    /* ================= 3. 教師專屬：模式控制面板新網頁 (深色專業風格) ================= */
+    function openTeacherControlPanelWindow() {
+      const panelWin = window.open('', '_blank', 'width=980,height=820');
+      if (!panelWin) {
+        alert('請允許瀏覽器彈出視窗以檢視「模式控制面板」！');
+        return;
+      }
+
+      const cfg = currentExamConfig || {};
+      const allCats = cfg.allConfigCategories || GROUP_DEFINITIONS.flatMap(g => g.items);
+      const lockedCats = cfg.lockedCategories || [];
+      const currentIsOpen = cfg.isExamMode ? 1 : 0;
+      const currentExamName = cfg.examName !== '日常練習' ? cfg.examName : '第1段數學AI能力測驗';
+      const currentQCount = cfg.questionCount > 0 ? cfg.questionCount : 30;
+      const currentMultiplier = cfg.lotteryMultiplier || 1;
+
+      // 構建深色系專業面板 HTML
+      const panelHtml = `
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <title>🎛️ AIMathQuest 模式控制面板</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #0b0f19; color: #f1f5f9; padding: 28px 24px; min-height: 100vh; }
+    .panel-container { max-width: 860px; margin: 0 auto; background: #111827; border: 1.5px solid #1f2937; border-radius: 20px; padding: 32px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #1f2937; padding-bottom: 20px; margin-bottom: 28px; }
+    .panel-title { font-size: 1.6rem; font-weight: 800; color: #38bdf8; letter-spacing: -0.5px; }
+    .panel-badge { font-size: 0.8rem; background: #0369a1; color: #e0f2fe; padding: 4px 10px; border-radius: 999px; font-weight: 800; }
+    
+    .form-item { margin-bottom: 26px; }
+    .form-label { display: block; font-size: 0.95rem; font-weight: 700; color: #94a3b8; margin-bottom: 10px; }
+    
+    /* iOS 左右切換按鈕 */
+    .ios-switch-box { display: flex; align-items: center; gap: 14px; }
+    .ios-switch { position: relative; display: inline-block; width: 56px; height: 32px; }
+    .ios-switch input { opacity: 0; width: 0; height: 0; }
+    .slider-toggle { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .3s; border-radius: 34px; }
+    .slider-toggle:before { position: absolute; content: ""; height: 24px; width: 24px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+    input:checked + .slider-toggle { background-color: #10b981; }
+    input:checked + .slider-toggle:before { transform: translateX(24px); }
+    .switch-status-text { font-weight: 800; font-size: 1.05rem; color: #cbd5e1; }
+
+    .input-dark { width: 100%; background: #1e293b; border: 1.5px solid #334155; color: #f8fafc; padding: 12px 16px; border-radius: 12px; font-size: 1rem; font-weight: 600; outline: none; transition: all 0.2s; }
+    .input-dark:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); }
+    
+    /* 10-60 題目滑桿 */
+    .range-box { display: flex; align-items: center; gap: 18px; }
+    .slider-dark { flex: 1; height: 8px; border-radius: 4px; background: #334155; outline: none; -webkit-appearance: none; }
+    .slider-dark::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: #38bdf8; cursor: pointer; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+    .slider-val-badge { background: #0369a1; color: #ffffff; padding: 6px 16px; border-radius: 10px; font-weight: 800; font-size: 1.1rem; min-width: 70px; text-align: center; }
+
+    /* 矩陣多選課題 */
+    .matrix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-top: 8px; }
+    .matrix-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: #cbd5e1; transition: all 0.2s; }
+    .matrix-item:hover { border-color: #38bdf8; }
+    .matrix-item.checked { background: rgba(56, 189, 248, 0.12); border-color: #38bdf8; color: #38bdf8; }
+    .matrix-item input { accent-color: #38bdf8; width: 16px; height: 16px; }
+
+    .btn-submit-panel { width: 100%; margin-top: 32px; padding: 16px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; border: none; border-radius: 14px; font-size: 1.15rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35); transition: all 0.2s; }
+    .btn-submit-panel:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(2, 132, 199, 0.5); }
+  </style>
+</head>
+<body>
+  <div class="panel-container">
+    <div class="panel-header">
+      <div class="panel-title">🎛️ AIMathQuest 模式控制面板</div>
+      <div class="panel-badge">教師組別專屬後台</div>
+    </div>
+
+    <!-- A2: 開啟/關閉 iOS 切換 -->
+    <div class="form-item">
+      <label class="form-label">⚙️ A2 格子：測驗模式狀態 (開啟 / 關閉)</label>
+      <div class="ios-switch-box">
+        <label class="ios-switch">
+          <input type="checkbox" id="switchExamMode" ${currentIsOpen ? 'checked' : ''} onchange="updateSwitchText()">
+          <span class="slider-toggle"></span>
+        </label>
+        <span id="switchStatusText" class="switch-status-text">${currentIsOpen ? '🟢 開啟 (1)' : '⚪ 關閉 (0)'}</span>
+      </div>
+    </div>
+
+    <!-- B2: 測驗名稱 -->
+    <div class="form-item">
+      <label class="form-label" for="txtExamName">📝 B2 格子：測驗名稱</label>
+      <input type="text" id="txtExamName" class="input-dark" value="${escapeHtml(currentExamName)}" placeholder="例如：第一段S1A數學AI測評1">
+    </div>
+
+    <!-- C2: 題目數量 (10~60 題) -->
+    <div class="form-item">
+      <label class="form-label">🎯 C2 格子：測驗題目數量 (10 ~ 60 題)</label>
+      <div class="range-box">
+        <input type="range" id="rangeQCount" class="slider-dark" min="10" max="60" step="5" value="${currentQCount}" oninput="document.getElementById('valQCount').textContent = this.value + ' 題'">
+        <div id="valQCount" class="slider-val-badge">${currentQCount} 題</div>
+      </div>
+    </div>
+
+    <!-- D2往右格子：選擇課題 (矩陣多選) -->
+    <div class="form-item">
+      <label class="form-label">📚 D2 往右格子：考核課題選擇 (矩陣多選打勾)</label>
+      <div class="matrix-grid" id="categoryMatrixBox">
+        ${allCats.map(cat => `
+          <label class="matrix-item ${lockedCats.includes(cat) ? 'checked' : ''}" onclick="toggleMatrixClass(this)">
+            <input type="checkbox" name="chkCat" value="${escapeHtml(cat)}" ${lockedCats.includes(cat) ? 'checked' : ''}>
+            <span>${escapeHtml(cat)}</span>
+          </label>
+        `).join('')}
+      </div>
+    </div>
+
+    <!-- A5: 抽獎加乘倍率 -->
+    <div class="form-item">
+      <label class="form-label" for="numMultiplier">🎁 A5 格子：幸運抽獎加乘倍率係數</label>
+      <input type="number" id="numMultiplier" class="input-dark" min="1" max="100" step="1" value="${currentMultiplier}" placeholder="預設：1">
+    </div>
+
+    <button class="btn-submit-panel" onclick="savePanelSettings()">⚡ 設置！(更新自定義模式分頁)</button>
+  </div>
+
+  <script>
+    function updateSwitchText() {
+      const isChecked = document.getElementById('switchExamMode').checked;
+      document.getElementById('switchStatusText').textContent = isChecked ? '🟢 開啟 (1)' : '⚪ 關閉 (0)';
+    }
+
+    function toggleMatrixClass(label) {
+      setTimeout(() => {
+        const input = label.querySelector('input');
+        label.classList.toggle('checked', input.checked);
+      }, 10);
+    }
+
+    async function savePanelSettings() {
+      const isOpen = document.getElementById('switchExamMode').checked;
+      const examName = document.getElementById('txtExamName').value.trim();
+      const questionCount = parseInt(document.getElementById('rangeQCount').value, 10);
+      const lotteryMultiplier = parseFloat(document.getElementById('numMultiplier').value) || 1;
+      
+      const checkedBoxes = Array.from(document.querySelectorAll('input[name="chkCat"]:checked')).map(cb => cb.value);
+
+      if (isOpen && !examName) {
+        alert('開啟測驗模式時必須輸入測驗名稱！');
+        return;
+      }
+      if (isOpen && checkedBoxes.length === 0) {
+        alert('請至少勾選一個考核課題！');
+        return;
+      }
+
+      const btn = document.querySelector('.btn-submit-panel');
+      btn.textContent = '⏳ 正在同步試算表...';
+      btn.disabled = true;
+
+      try {
+        const response = await fetch("${GAS_API_URL}", {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: 'updateCustomModeConfig',
+            token: "${userAuthToken}",
+            data: {
+              isOpen: isOpen,
+              examName: examName,
+              questionCount: questionCount,
+              selectedCategories: checkedBoxes,
+              lotteryMultiplier: lotteryMultiplier
+            }
+          })
+        });
+        const res = await response.json();
+        if (res.status === 'success') {
+          alert('🎉 成功！' + res.message);
+          if (window.opener) window.opener.location.reload();
+        } else {
+          alert('設定失敗：' + res.message);
+        }
+      } catch (err) {
+        alert('傳輸失敗：' + err.message);
+      } finally {
+        btn.textContent = '⚡ 設置！(更新自定義模式分頁)';
+        btn.disabled = false;
+      }
+    }
+  <\/script>
+</body>
+</html>
+      `;
+
+      panelWin.document.open();
+      panelWin.document.write(panelHtml);
+      panelWin.document.close();
+    }
+
+    /* ================= 4. 頭像與個人設定面板 ================= */
     function openProfileModal(isMandatory = false) {
       const modal = document.getElementById('profileModal');
       const cancelBtn = document.getElementById('btnCancelProfile');
@@ -1242,7 +1464,7 @@
       }
     }
 
-    /* ================= 4. 防作弊監控與阻斷警告 ================= */
+    /* ================= 5. 防作弊監控與阻斷警告 ================= */
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && isQuizActive && !isViolationModalOpen) {
         recordViolation('切換瀏覽器分頁或視窗最小化');
@@ -1278,7 +1500,7 @@
       setTimeout(() => { isViolationModalOpen = false; }, 350);
     }
 
-    /* ================= 5. 題庫選擇與鎖定機制 ================= */
+    /* ================= 6. 題庫選擇與鎖定機制 ================= */
     window.addEventListener('DOMContentLoaded', () => {
       const slider = document.getElementById('countSlider');
       const sliderVal = document.getElementById('sliderValue');
@@ -1511,7 +1733,7 @@
       document.getElementById('energyBarFill').style.width = `${percent}%`;
     }
 
-    /* ================= 6. 交卷、抽獎與事件判定鏈條 ================= */
+    /* ================= 7. 交卷、抽獎與事件判定鏈條 ================= */
     async function handleSubmitQuizWithRetry() {
       const total = currentQuizData.length;
       const answeredCount = Object.keys(userAnswers).length;
@@ -1582,7 +1804,6 @@
 
       fireCampusConfetti();
 
-      // 流星雨下的祝福雙倍提示橫幅
       const meteorBanner = document.getElementById('meteorExpBanner');
       if (result.meteorShowerApplied) {
         meteorBanner.style.display = 'inline-block';
@@ -1669,17 +1890,14 @@
       }
     }
 
-    /* ================= 7. 隨機事件與後續觸發管線 ================= */
     function startPostSubmissionPipeline(result) {
       activeLotteryData = result.lotteryResult;
       activePendingQueue = [];
 
-      // 若流星雨觸發過，同步更新本地狀態
       if (result.meteorShowerApplied && currentUserProfile) {
         currentUserProfile.meteorShowerActive = '0';
       }
 
-      // 若多多益善解除，同步更新本地狀態
       if (result.duoDuoYiShanCleared && currentUserProfile) {
         currentUserProfile.moreIsMerrierActive = '0';
         currentUserProfile.moreIsMerrierSender = '';
@@ -1697,8 +1915,8 @@
       if (p.megaphone) {
         activePendingQueue.push({
           type: 'megaphone',
-          title: '📢 道具：眾裡尋他傳聲筒',
-          icon: '📢',
+          title: '💬 道具：眾裡尋他傳聲筒',
+          icon: '💬',
           content: `來自【<b>${escapeHtml(p.megaphone.sender || '某同學')}</b>】傳給您一段話：<br><br>` +
                    `<div style="font-style:italic; color:#0f172a; font-weight:800; font-size:1.05rem;">「${escapeHtml(p.megaphone.message)}」</div><br>` +
                    `您已獲得<b>「驀然回首傳聲筒」</b>，是否要回應對方一段訊息？`,
@@ -1710,8 +1928,8 @@
       if (p.lookback) {
         activePendingQueue.push({
           type: 'lookback',
-          title: '回聲：驀然回首傳聲筒',
-          icon: '💫',
+          title: '💬 回聲：驀然回首傳聲筒',
+          icon: '💬',
           content: `【<b>${escapeHtml(p.lookback.sender || '某同學')}</b>】回應了您的傳聲：<br><br>` +
                    `<div style="font-style:italic; color:#0f172a; font-weight:800; font-size:1.05rem;">「${escapeHtml(p.lookback.message)}」</div>`
         });
@@ -1720,54 +1938,53 @@
         activePendingQueue.push({
           type: 'duoDuoCleared',
           title: '🎉 技能效果解除：多多益善',
-          icon: '🔓',
+          icon: '🤪',
           content: `太厲害了！您已在練習模式下順利完成 60 道題目，成功解除來自對方的「<b>多多益善</b>」效果限制！之後練習可自由調整題數！`
         });
       }
 
-      setTimeout(showLotteryModal, 1200);
+      setTimeout(showLotteryModal, 800);
     }
 
+    // 抽獎 Modal 使用 🎁 禮物 emoji
     function showLotteryModal() {
-	  if (!activeLotteryData) return;
+      if (!activeLotteryData) return;
 
-	  const modal = document.getElementById('lotteryResultModal');
-	  const desc = document.getElementById('lotteryModalDesc');
-	  const box = document.getElementById('lotteryNumbersBox');
-	  const prizeBanner = document.getElementById('lotteryPrizeBanner');
-	  const prizeName = document.getElementById('lotteryPrizeName');
+      const modal = document.getElementById('lotteryResultModal');
+      const desc = document.getElementById('lotteryModalDesc');
+      const box = document.getElementById('lotteryNumbersBox');
+      const prizeBanner = document.getElementById('lotteryPrizeBanner');
+      const prizeName = document.getElementById('lotteryPrizeName');
 
-	  const d = activeLotteryData;
-	  let descHtml = `🎯 基礎抽獎數：<b>${d.baseLotteryCount}</b> 個 ｜ 數字B：<b>${d.numB}</b> ｜ 數字C：<b>${d.numC}</b> 個`;
-	  
-	  if (d.multiplier > 1) {
-		descHtml += ` ｜ 加乘倍率：<b style="color:#f59e0b;">x${d.multiplier}</b>`;
-	  }
-	  descHtml += `<br>🎰 最終抽取號碼數：<b style="color:#2563eb; font-size:1.15rem;">${d.finalDrawCount}</b> 個`;
-	  
-	  if (d.finalDrawCount >= 400) {
-		descHtml += ` <span style="color:#10b981; font-weight:800;">(已達400上限，100%必中獎！)</span>`;
-	  }
-	  descHtml += `<br>🌟 本期中獎號碼：<b style="color:#ef4444; font-size:1.25rem;">【 ${d.winningNumber} 】</b>`;
-	  desc.innerHTML = descHtml;
+      const d = activeLotteryData;
+      let descHtml = `🎯 基礎抽獎數：<b>${d.baseLotteryCount}</b> 個 ｜ 數字B：<b>${d.numB}</b> ｜ 數字C：<b>${d.numC}</b> 個`;
+      if (d.multiplier > 1) {
+        descHtml += ` ｜ 加乘倍率：<b style="color:#f59e0b;">x${d.multiplier}</b>`;
+      }
+      descHtml += `<br>🎁 最終抽取號碼數：<b style="color:#2563eb; font-size:1.15rem;">${d.finalDrawCount}</b> 個`;
+      if (d.finalDrawCount >= 400) {
+        descHtml += ` <span style="color:#10b981; font-weight:800;">(已達400上限，100%必中獎！)</span>`;
+      }
+      descHtml += `<br>🌟 本期中獎號碼：<b style="color:#ef4444; font-size:1.25rem;">【 ${d.winningNumber} 】</b>`;
+      desc.innerHTML = descHtml;
 
-	  box.innerHTML = '';
-	  d.drawnNumbers.forEach(n => {
-		const chip = document.createElement('span');
-		chip.className = 'lottery-chip' + (n === d.winningNumber ? ' hit' : '');
-		chip.textContent = n;
-		box.appendChild(chip);
-	  });
+      box.innerHTML = '';
+      d.drawnNumbers.forEach(n => {
+        const chip = document.createElement('span');
+        chip.className = 'lottery-chip' + (n === d.winningNumber ? ' hit' : '');
+        chip.textContent = n;
+        box.appendChild(chip);
+      });
 
-	  if (d.isWon === 1) {
-		prizeBanner.style.display = 'block';
-		prizeName.textContent = d.awardedEvent;
-	  } else {
-		prizeBanner.style.display = 'none';
-	  }
+      if (d.isWon === 1) {
+        prizeBanner.style.display = 'block';
+        prizeName.textContent = d.awardedEvent;
+      } else {
+        prizeBanner.style.display = 'none';
+      }
 
-	  modal.style.display = 'flex';
-	}
+      modal.style.display = 'flex';
+    }
 
     function proceedAfterLottery() {
       document.getElementById('lotteryResultModal').style.display = 'none';
@@ -1790,7 +2007,7 @@
       }
     }
 
-    /* 心想事成 */
+    /* 心想事成 (🍀) */
     let chosenWish = 'meteor';
     function openWishesModal() {
       document.getElementById('wishesModal').style.display = 'flex';
@@ -1805,7 +2022,7 @@
       else if (chosenWish === 'more') openInteractiveActionModal('more_the_merrier');
     }
 
-    /* 互動發動彈窗 */
+    /* 互動發動彈窗 (規範指定 Emoji) */
     function openInteractiveActionModal(type, prefillClass = '', prefillName = '') {
       currentActionType = type;
       const modal = document.getElementById('interactiveActionModal');
@@ -1826,19 +2043,19 @@
         msgGroup.style.display = 'none';
         btn.textContent = '祝福！';
       } else if (type === 'megaphone') {
-        icon.textContent = '📢';
+        icon.textContent = '💬';
         title.textContent = '使用：眾裡尋他傳聲筒';
         desc.textContent = '說出一個人的姓名並傳送一句話，對方將獲得「驀然回首傳聲筒」回應機會！';
         msgGroup.style.display = 'block';
         btn.textContent = '傳聲！';
       } else if (type === 'more_the_merrier') {
-        icon.textContent = '🎁';
+        icon.textContent = '🤪';
         title.textContent = '發動技能：多多益善';
         desc.textContent = '說出一個人的姓名，對方下一次練習必須強制挑戰 60 道題目！';
         msgGroup.style.display = 'none';
         btn.textContent = '益你！';
       } else if (type === 'lookback') {
-        icon.textContent = '💫';
+        icon.textContent = '💬';
         title.textContent = '回應：驀然回首傳聲筒';
         desc.textContent = '回應對方一段文字訊息：';
         msgGroup.style.display = 'block';
@@ -1877,7 +2094,7 @@
         processNextPendingNotice();
       } catch (err) {
         showLoading(false);
-        alert('發送失敗：' + err.message);
+        alert(err.message || '發送失敗');
       }
     }
 
@@ -1949,7 +2166,6 @@
       document.getElementById('setupView').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      // 返回自定義設置時重新應用當前限制
       const slider = document.getElementById('countSlider');
       const sliderVal = document.getElementById('sliderValue');
       if (isMoreTheMerrierActive()) {
