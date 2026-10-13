@@ -751,6 +751,7 @@
       line-height: 1.4;
     }
 
+    /* 近期活動專屬卡片樣式 */
     .activity-card {
       background: #ffffff;
       border-radius: 16px;
@@ -1224,6 +1225,7 @@
       document.getElementById('hudLevel').textContent = profile.level ? ('LV.' + profile.level) : '';
       document.getElementById('hudTitle').textContent = profile.title || '';
 
+      // 頭像採用 icons/icon_{i}.png
       const avatarStyle = profile.avatarStyle || 'icon_1';
       document.getElementById('hudAvatarImg').src = `icons/${avatarStyle}.png`;
     }
@@ -1551,6 +1553,7 @@
       document.getElementById('profileModal').style.display = 'none';
     }
 
+    // 零 API 請求：直接循環渲染本地 20 張頭像
     function renderLocalAvatarMatrix() {
       const container = document.getElementById('avatarMatrixContainer');
       container.innerHTML = '';
@@ -1661,6 +1664,7 @@
       });
     });
 
+    // 接收後端安全下發之模組群組，無任何前端硬編碼敏感結構
     function renderBackendGroupedCategories(groups) {
       const container = document.getElementById('categoryGroupContainer');
       container.innerHTML = '';
@@ -1779,7 +1783,7 @@
         totalCount = 60;
       }
 
-      showLoading(true, '⚡ 正在為您配置題目中...');
+      showLoading(true, '⚡ 正在為您智慧配置考卷中...');
 
       try {
         const res = await callGasApi('generateQuiz', { selectedCategories: selectedCats, totalCount: totalCount });
