@@ -1779,7 +1779,7 @@
         totalCount = 60;
       }
 
-      showLoading(true, '⚡ 正在為您智慧配置考卷中...');
+      showLoading(true, '⚡ 正在為您配置題目中...');
 
       try {
         const res = await callGasApi('generateQuiz', { selectedCategories: selectedCats, totalCount: totalCount });
@@ -2033,10 +2033,10 @@
         examRoom: document.getElementById('examRoomInput').value.trim() || '日常練習',
         violationCount: violationCount,
         violationLogs: violationLogs.join('；') || '無異常',
-        answers: currentQuizData.map(q => ({
+        answers: currentQuizData.map((q, idx) => ({
           sheetName: q.sheetName,
           row: q.row,
-          choice: userAnswers[currentQuizData.indexOf(q)] || ''
+          choice: userAnswers[idx] || ''
         }))
       };
 
