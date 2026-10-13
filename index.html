@@ -468,7 +468,7 @@
       word-break: break-word;
     }
 
-    /* 終端機風格程式碼展示框 (選項 B 完整啟用) */
+    /* 終端機風格代碼區塊 (選項 B) */
     .python-code-box {
       display: block;
       background: #0f172a;
@@ -1065,7 +1065,7 @@
         </div>
       </div>
 
-      <!-- 近期活動推廣區 (點擊海報開啟章程) -->
+      <!-- 近期活動推廣區 -->
       <div id="recentActivitiesSection" class="campus-card" style="margin-top: 24px; display: none;">
         <h3 style="text-align: center; font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 20px;">
           📢 近期活動
@@ -1241,7 +1241,12 @@
       document.getElementById('hudLevel').textContent = profile.level ? ('LV.' + profile.level) : '';
       document.getElementById('hudTitle').textContent = profile.title || '';
 
-      const avatarStyle = profile.avatarStyle || 'icon_1';
+      // 防禦性轉譯：相容舊版存入的「頭像1」或純數字
+      let avatarStyle = profile.avatarStyle || 'icon_1';
+      if (!avatarStyle.startsWith('icon_')) {
+        const num = avatarStyle.replace(/[^0-9]/g, '');
+        avatarStyle = num ? `icon_${num}` : 'icon_1';
+      }
       document.getElementById('hudAvatarImg').src = `icons/${avatarStyle}.png`;
     }
 
@@ -2541,7 +2546,7 @@
         .replace(/'/g, "&#039;");
     }
 
-    // 選項 B 啟用：若包含 Python 關鍵特徵，自動包裝為 .python-code-box 終端機風格代碼框
+    // 選項 B 啟用：將 Python 程式碼轉譯並封裝進終端機框
     function formatPythonQuestion(rawText) {
       if (!rawText) return '';
       var text = String(rawText);
