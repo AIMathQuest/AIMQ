@@ -465,25 +465,25 @@
       color: #0f172a;
       line-height: 1.6;
       margin-bottom: 18px;
-      white-space: pre-wrap;
       word-break: break-word;
-      font-family: 'Consolas', 'Roboto Mono', 'Fira Code', 'Courier New', monospace;
     }
-	
-	.python-code-box {
+
+    /* 終端機風格程式碼展示框 (選項 B 完整啟用) */
+    .python-code-box {
       display: block;
       background: #0f172a;
       color: #38bdf8;
       font-family: 'Consolas', 'Roboto Mono', 'Fira Code', 'Courier New', monospace;
-      font-size: 0.98rem;
+      font-size: 0.96rem;
       font-weight: 500;
       line-height: 1.6;
-      padding: 12px 18px;
-      border-radius: 10px;
+      padding: 14px 18px;
+      border-radius: 12px;
       margin: 12px 0;
       border: 1px solid #1e293b;
-      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
-      white-space: pre;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
+      white-space: pre-wrap;
+      word-break: break-word;
       overflow-x: auto;
     }
 
@@ -768,7 +768,6 @@
       line-height: 1.4;
     }
 
-    /* 近期活動專屬卡片樣式 */
     .activity-card {
       background: #ffffff;
       border-radius: 16px;
@@ -844,7 +843,7 @@
     </div>
   </div>
 
-  <!-- 暱稱與頭像設定 Modal (直接讀取 icons/ 目錄，零 API 消耗) -->
+  <!-- 暱稱與頭像設定 Modal -->
   <div id="profileModal" class="modal-overlay">
     <div class="modal-card">
       <h3 id="modalTitle" style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
@@ -1066,7 +1065,7 @@
         </div>
       </div>
 
-      <!-- 近期活動推廣區 -->
+      <!-- 近期活動推廣區 (點擊海報開啟章程) -->
       <div id="recentActivitiesSection" class="campus-card" style="margin-top: 24px; display: none;">
         <h3 style="text-align: center; font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 20px;">
           📢 近期活動
@@ -1242,7 +1241,6 @@
       document.getElementById('hudLevel').textContent = profile.level ? ('LV.' + profile.level) : '';
       document.getElementById('hudTitle').textContent = profile.title || '';
 
-      // 頭像採用 icons/icon_{i}.png
       const avatarStyle = profile.avatarStyle || 'icon_1';
       document.getElementById('hudAvatarImg').src = `icons/${avatarStyle}.png`;
     }
@@ -1570,7 +1568,6 @@
       document.getElementById('profileModal').style.display = 'none';
     }
 
-    // 零 API 請求：直接循環渲染本地 20 張頭像
     function renderLocalAvatarMatrix() {
       const container = document.getElementById('avatarMatrixContainer');
       container.innerHTML = '';
@@ -1681,7 +1678,6 @@
       });
     });
 
-    // 接收後端安全下發之模組群組，無任何前端硬編碼敏感結構
     function renderBackendGroupedCategories(groups) {
       const container = document.getElementById('categoryGroupContainer');
       container.innerHTML = '';
@@ -1800,7 +1796,7 @@
         totalCount = 60;
       }
 
-      showLoading(true, '⚡ 正在為您智慧配置考卷中...');
+      showLoading(true, '⚡ 正在為您配置題目中...');
 
       try {
         const res = await callGasApi('generateQuiz', { selectedCategories: selectedCats, totalCount: totalCount });
@@ -1878,7 +1874,7 @@
       document.getElementById('energyBarFill').style.width = `${percent}%`;
     }
 
-    /* ================= 7. 個人錯題庫重溫 ================= */
+    /* ================= 7. 個人錯題庫系統 ================= */
     async function openMistakeBankView() {
       document.getElementById('setupView').style.display = 'none';
       document.getElementById('mistakeBankView').style.display = 'block';
@@ -2545,6 +2541,7 @@
         .replace(/'/g, "&#039;");
     }
 
+    // 選項 B 啟用：若包含 Python 關鍵特徵，自動包裝為 .python-code-box 終端機風格代碼框
     function formatPythonQuestion(rawText) {
       if (!rawText) return '';
       var text = String(rawText);
@@ -2558,6 +2555,11 @@
       text = text.replace(/(for\s+[^:]+:)\s*(if\s+[^:]+:)/g, '$1\n    $2');
       text = text.replace(/(if\s+[^:]+:)\s*(continue|break|pass)/g, '$1\n        $2');
 
+      const isPythonCode = text.includes('\n') || text.includes('print(') || text.includes('def ') || text.includes('import ') || text.includes('for ') || text.includes('while ') || text.includes('==');
+
+      if (isPythonCode) {
+        return `<div class="python-code-box">${escapeHtml(text)}</div>`;
+      }
       return escapeHtml(text);
     }
   </script>
