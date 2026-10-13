@@ -55,7 +55,6 @@
       padding: 0 16px 80px 16px;
     }
 
-    /* 需求 1：頂部慶典加乘高亮光暈橫幅 */
     .festival-banner {
       display: none;
       background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
@@ -461,33 +460,15 @@
     }
     .q-counter { font-weight: 800; font-size: 0.95rem; color: var(--secondary); }
     .q-content {
-	  font-size: 1.12rem;
-	  font-weight: 700;
-	  color: #0f172a;
-	  line-height: 1.6;
-	  margin-bottom: 18px;
-	  white-space: pre-wrap;
-	  word-break: break-word;
-	  font-family: 'Consolas', 'Roboto Mono', 'Fira Code', 'Courier New', monospace;
-}
-	}
-	
-	.python-code-box {
-	  display: block;
-	  background: #0f172a;           /* 深色終端機背景 */
-	  color: #38bdf8;                /* 高亮代碼字色 */
-	  font-family: 'Consolas', 'Roboto Mono', 'Fira Code', 'Courier New', monospace;
-	  font-size: 0.98rem;
-	  font-weight: 500;
-	  line-height: 1.6;
-	  padding: 12px 18px;
-	  border-radius: 10px;
-	  margin: 12px 0;
-	  border: 1px solid #1e293b;
-	  box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.25);
-	  white-space: pre;               /* 嚴格保留所有換行與空格縮排 */
-	  overflow-x: auto;              /* 手機版超出時可橫向滑動 */
-	}
+      font-size: 1.12rem;
+      font-weight: 700;
+      color: #0f172a;
+      line-height: 1.6;
+      margin-bottom: 18px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'Consolas', 'Roboto Mono', 'Fira Code', 'Courier New', monospace;
+    }
 
     .options-list { display: flex; flex-direction: column; gap: 10px; }
     .option-item {
@@ -518,14 +499,14 @@
     }
     .option-item.selected .option-circle { background: var(--primary); color: #ffffff; }
     .option-text {
-	  font-size: 1rem;
-	  font-weight: 600;
-	  color: #334155;
-	  line-height: 1.5;
-	  word-break: break-word;
-	  white-space: pre-wrap;
-	  font-family: 'Consolas', 'Roboto Mono', 'Segoe UI', monospace;
-	}
+      font-size: 1rem;
+      font-weight: 600;
+      color: #334155;
+      line-height: 1.5;
+      word-break: break-word;
+      white-space: pre-wrap;
+      font-family: 'Consolas', 'Roboto Mono', 'Segoe UI', monospace;
+    }
 
     .result-center { text-align: center; padding: 10px 0 20px 0; }
     .score-badge-circle {
@@ -593,30 +574,30 @@
     .review-opt.opt-user-wrong .review-circle { background: var(--danger); color: #ffffff; }
     .review-opt.opt-correct .review-circle { background: var(--success); color: #ffffff; }
     .review-text {
-	  flex: 1;
-	  font-size: 0.95rem;
-	  font-weight: 600;
-	  color: #334155;
-	  line-height: 1.4;
-	  word-break: break-word;
-	  white-space: pre-wrap;
-	  font-family: 'Consolas', 'Roboto Mono', monospace;
-	}
-	.review-flag { padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
+      flex: 1;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #334155;
+      line-height: 1.4;
+      word-break: break-word;
+      white-space: pre-wrap;
+      font-family: 'Consolas', 'Roboto Mono', monospace;
+    }
+    .review-flag { padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
     .flag-wrong { background: #fee2e2; color: #b91c1c; }
     .flag-correct { background: #dcfce7; color: #15803d; }
     .explanation-container {
-	  padding: 14px 16px;
-	  background: #f0f9ff;
-	  border-radius: 10px;
-	  border-left: 4px solid var(--secondary);
-	  font-size: 0.95rem;
-	  line-height: 1.6;
-	  color: #0369a1;
-	  white-space: pre-wrap;
-	  word-break: break-word;
-	  font-family: 'Consolas', 'Roboto Mono', sans-serif;
-	}
+      padding: 14px 16px;
+      background: #f0f9ff;
+      border-radius: 10px;
+      border-left: 4px solid var(--secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #0369a1;
+      white-space: pre-wrap;
+      word-break: break-word;
+      font-family: 'Consolas', 'Roboto Mono', sans-serif;
+    }
 
     .loader-box {
       position: fixed;
@@ -740,7 +721,6 @@
       animation: pulse 1s infinite;
     }
 
-    /* 需求 3：「心想事成」專用選擇項，點選轉鮮明亮黃色 */
     .wish-item {
       display: flex;
       align-items: center;
@@ -757,8 +737,8 @@
       border-color: #fde047;
     }
     .wish-item.selected {
-      background: #fef08a !important; /* 明顯鮮黃色底色 */
-      border-color: #eab308 !important; /* 金黃色高光邊框 */
+      background: #fef08a !important;
+      border-color: #eab308 !important;
       box-shadow: 0 4px 14px rgba(234, 179, 8, 0.32);
     }
     .wish-circle {
@@ -769,6 +749,61 @@
       font-size: 0.95rem;
       color: #1e293b;
       line-height: 1.4;
+    }
+
+    /* 近期活動專屬卡片樣式 */
+    .activity-card {
+      background: #ffffff;
+      border-radius: 16px;
+      border: 1.5px solid var(--border-color);
+      overflow: hidden;
+      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .activity-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+    }
+    .activity-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #0f172a;
+      text-align: center;
+      padding: 14px 16px;
+      background: #f8fafc;
+      border-bottom: 1.5px solid var(--border-color);
+    }
+    .activity-poster-box {
+      width: 100%;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      background: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .activity-poster-box img {
+      width: 100%;
+      max-height: 480px;
+      object-fit: contain;
+      display: block;
+      transition: transform 0.3s;
+    }
+    .activity-poster-box:hover img {
+      transform: scale(1.02);
+    }
+    .activity-hint {
+      position: absolute;
+      bottom: 10px;
+      right: 12px;
+      background: rgba(15, 23, 42, 0.75);
+      color: #ffffff;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      backdrop-filter: blur(4px);
     }
   </style>
 </head>
@@ -792,7 +827,7 @@
     </div>
   </div>
 
-  <!-- 暱稱與頭像設定 Modal -->
+  <!-- 暱稱與頭像設定 Modal (直接讀取 icons/ 目錄，零 API 消耗) -->
   <div id="profileModal" class="modal-overlay">
     <div class="modal-card">
       <h3 id="modalTitle" style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
@@ -809,9 +844,7 @@
 
       <div class="form-group" style="margin-bottom: 0;">
         <label class="form-label">🎭 點選更換頭像樣式 (5×4 矩陣)</label>
-        <div id="avatarMatrixContainer" class="avatar-matrix-grid">
-          <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 20px;">頭像庫載入中...</div>
-        </div>
+        <div id="avatarMatrixContainer" class="avatar-matrix-grid"></div>
       </div>
 
       <div style="display: flex; gap: 12px;">
@@ -821,7 +854,7 @@
     </div>
   </div>
 
-  <!-- 隨機抽獎揭曉 Modal (使用 🎁 禮物 emoji) -->
+  <!-- 隨機抽獎揭曉 Modal -->
   <div id="lotteryResultModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
       <div id="lotteryIcon" style="font-size: 3.5rem; margin-bottom: 8px;">🎁</div>
@@ -839,7 +872,7 @@
     </div>
   </div>
 
-  <!-- 特殊類：心想事成自選 Modal (需求 5：新增「增益：知識的共鳴」) -->
+  <!-- 特殊類：心想事成自選 Modal -->
   <div id="wishesModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
       <div style="font-size: 3.5rem; margin-bottom: 8px;">🍀</div>
@@ -897,7 +930,7 @@
     </div>
   </div>
 
-  <!-- 待觸發事件/狀態通知 Modal (需求 2 & 3: 帶確認後自動清除後台記錄防重複) -->
+  <!-- 待觸發事件/狀態通知 Modal -->
   <div id="pendingNoticeModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
       <div style="font-size: 3.2rem; margin-bottom: 8px;" id="noticeIcon">📬</div>
@@ -908,7 +941,7 @@
     </div>
   </div>
 
-  <!-- 需求 7：重置個人錯題庫 Modal -->
+  <!-- 重置個人錯題庫 Modal -->
   <div id="resetMistakeModal" class="modal-overlay">
     <div class="modal-card">
       <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
@@ -922,9 +955,7 @@
         <button type="button" class="btn-group-toggle" onclick="toggleSelectAllResetMistakes()">全選 / 取消</button>
       </div>
 
-      <div id="resetMistakeCategoryGrid" class="group-items-grid" style="max-height: 240px; overflow-y: auto; margin-bottom: 20px;">
-        <!-- 動態載入含有錯題的課題 -->
-      </div>
+      <div id="resetMistakeCategoryGrid" class="group-items-grid" style="max-height: 240px; overflow-y: auto; margin-bottom: 20px;"></div>
 
       <div style="display: flex; gap: 12px;">
         <button class="btn-campus" style="background: #e2e8f0; color: #334155; box-shadow: none;" onclick="closeResetMistakeModal()">取消</button>
@@ -934,7 +965,6 @@
   </div>
 
   <div class="app-container">
-    <!-- 需求 1：慶典加乘頂部橫幅 -->
     <div id="festivalBanner" class="festival-banner">
       🎉 慶典進行中，目前抽獎加乘倍數：<span id="festivalMultiplierVal">1</span> 倍！
     </div>
@@ -971,56 +1001,64 @@
     </div>
 
     <!-- 步驟 1：客製設定介面 -->
-    <div id="setupView" class="campus-card" style="display: none;">
-      <div class="user-hud-bar">
-        <!-- 教師專用模式控制面板按鈕 -->
-        <button id="btnTeacherPanelShortcut" class="btn-teacher-panel-badge" style="display:none;" onclick="openTeacherControlPanelWindow()" title="開啟教師專用模式控制面板">
-          🎛️ 模式控制面板
-        </button>
+    <div id="setupView" style="display: none;">
+      <div class="campus-card">
+        <div class="user-hud-bar">
+          <button id="btnTeacherPanelShortcut" class="btn-teacher-panel-badge" style="display:none;" onclick="openTeacherControlPanelWindow()" title="開啟教師專用模式控制面板">
+            🎛️ 模式控制面板
+          </button>
 
-        <div class="hud-pill">
-          <div class="hud-avatar-slot" onclick="openProfileModal(false)" title="點選更換頭像與暱稱">
-            <img id="hudAvatarImg" src="" alt="Avatar">
+          <div class="hud-pill">
+            <div class="hud-avatar-slot" onclick="openProfileModal(false)" title="點選更換頭像與暱稱">
+              <img id="hudAvatarImg" src="icons/icon_1.png" alt="Avatar">
+            </div>
+            <div class="hud-name-wrapper">
+              <span id="hudNickname" class="hud-nickname">載入中...</span>
+              <span id="hudAchievement" class="hud-achievement-inline"></span>
+            </div>
+            <span id="hudLevel" class="hud-badge-slot hud-level"></span>
+            <span id="hudTitle" class="hud-badge-slot hud-title"></span>
           </div>
-          <div class="hud-name-wrapper">
-            <span id="hudNickname" class="hud-nickname">載入中...</span>
-            <span id="hudAchievement" class="hud-achievement-inline"></span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" id="examRoomLabel">🏫 目前模式</label>
+          <input type="text" id="examRoomInput" class="input-text" value="日常練習" readonly>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">📂 選擇練習範疇 (依類別自選或全選)</label>
+          <div id="categoryGroupContainer" class="category-group-list">
+            <div style="color: var(--text-muted); font-size: 0.95rem;">正在驗證身分並載入題庫...</div>
           </div>
-          <span id="hudLevel" class="hud-badge-slot hud-level"></span>
-          <span id="hudTitle" class="hud-badge-slot hud-title"></span>
+        </div>
+
+        <div class="form-group">
+          <div class="slider-box">
+            <div class="slider-header">
+              <span class="form-label" style="margin-bottom:0;">🎯 本次練習題數</span>
+              <span id="sliderValue" class="slider-badge">30 題</span>
+            </div>
+            <input type="range" id="countSlider" class="range-slider" min="20" max="60" step="10" value="30">
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 14px;">
+          <button id="btnStart" class="btn-campus" style="flex: 2;" onclick="handleStartQuiz()">🚀 隨機生成題目</button>
+          <button id="btnOpenMistakes" class="btn-campus" style="flex: 1; background: linear-gradient(135deg, #475569 0%, #334155 100%); box-shadow: 0 4px 12px rgba(51, 65, 85, 0.25);" onclick="openMistakeBankView()">📖 個人錯題庫</button>
         </div>
       </div>
 
-      <div class="form-group">
-        <label class="form-label" id="examRoomLabel">🏫 目前模式</label>
-        <input type="text" id="examRoomInput" class="input-text" value="日常練習" readonly>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">📂 選擇練習範疇 (依類別自選或全選)</label>
-        <div id="categoryGroupContainer" class="category-group-list">
-          <div style="color: var(--text-muted); font-size: 0.95rem;">正在驗證身分並載入題庫...</div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <div class="slider-box">
-          <div class="slider-header">
-            <span class="form-label" style="margin-bottom:0;">🎯 本次練習題數</span>
-            <span id="sliderValue" class="slider-badge">30 題</span>
-          </div>
-          <input type="range" id="countSlider" class="range-slider" min="20" max="60" step="10" value="30">
-        </div>
-      </div>
-
-      <div style="display: flex; gap: 14px;">
-        <button id="btnStart" class="btn-campus" style="flex: 2;" onclick="handleStartQuiz()">🚀 隨機生成題目</button>
-        <!-- 需求 7：個人錯題庫跳轉按鈕 -->
-        <button id="btnOpenMistakes" class="btn-campus" style="flex: 1; background: linear-gradient(135deg, #475569 0%, #334155 100%); box-shadow: 0 4px 12px rgba(51, 65, 85, 0.25);" onclick="openMistakeBankView()">📖 個人錯題庫</button>
+      <!-- 近期活動推廣區 -->
+      <div id="recentActivitiesSection" class="campus-card" style="margin-top: 24px; display: none;">
+        <h3 style="text-align: center; font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 20px;">
+          📢 近期活動
+        </h3>
+        <div id="activitiesListContainer" style="display: flex; flex-direction: column; gap: 24px;"></div>
       </div>
     </div>
 
-    <!-- 步驟 1.5：個人錯題庫重溫頁面 (需求 7) -->
+    <!-- 步驟 1.5：個人錯題庫重溫頁面 -->
     <div id="mistakeBankView" style="display: none;">
       <div class="campus-card">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--border-color); padding-bottom: 14px; margin-bottom: 18px;">
@@ -1099,7 +1137,7 @@
 
   <div id="loadingOverlay" class="loader-box" style="display: none;">
     <div class="spinner"></div>
-    <div id="loadingText">題目準備中...</div>
+    <div id="loadingText">載入中...</div>
   </div>
 
   <script>
@@ -1108,8 +1146,7 @@
     let userAuthToken = '';
     let currentUserProfile = null;
     let currentExamConfig = null;
-    let availableAvatars = [];
-    let selectedAvatarStyle = '';
+    let selectedAvatarStyle = 'icon_1';
 
     let currentQuizData = [];
     const userAnswers = {};
@@ -1123,103 +1160,9 @@
     let activePendingQueue = [];
     let currentActionType = '';
 
-    // 個人錯題庫快取數據
     let currentMistakeBankData = null;
 
-    const GROUP_DEFINITIONS = [
-      {
-        id: 'literacy',
-        title: '📘 AI素養類',
-        subtitle: '核心通識與歷史倫理',
-        items: ['人工智能發展簡史', '人工智能與道德倫理', '人工智能初探', '人工智能學習方式']
-      },
-      {
-        id: 'genai',
-        title: '✨ 生成式AI三部曲',
-        subtitle: '前沿大模型與智慧體指南',
-        items: ['零基礎學AI', '大模型提示詞工程指南', '智能體AI權威指南']
-      },
-      {
-        id: 'cert',
-        title: '🏆 專業認證類',
-        subtitle: '等級認證實戰模擬',
-        items: ['Python基礎編程', 'AICE一級認證', 'AICE二級認證', 'AICE三級認證', 'AICE四級認證', 'AICE五級認證', 'AISE一級認證', 'AISE二級認證']
-      }
-    ];
-
-    /* ================= 1. HTML5 Canvas 動態背景引擎 ================= */
-    (function initAmbientCanvas() {
-      const canvas = document.getElementById('ambientCanvas');
-      const ctx = canvas.getContext('2d');
-      let width, height;
-      let particles = [];
-      const mathSymbols = ['∑', 'π', '∞', '∫', 'λ', '√x', '≈', 'θ', 'f(x)'];
-
-      function resize() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-      }
-      window.addEventListener('resize', resize);
-      resize();
-
-      class Particle {
-        constructor() { this.reset(); }
-        reset() {
-          this.x = Math.random() * width;
-          this.y = Math.random() * height;
-          this.vx = (Math.random() - 0.5) * 0.45;
-          this.vy = (Math.random() - 0.5) * 0.45;
-          this.radius = Math.random() * 2 + 1;
-          this.isSymbol = Math.random() < 0.28;
-          this.symbol = mathSymbols[Math.floor(Math.random() * mathSymbols.length)];
-          this.opacity = Math.random() * 0.35 + 0.1;
-        }
-        update() {
-          this.x += this.vx;
-          this.y += this.vy;
-          if (this.x < 0 || this.x > width) this.vx *= -1;
-          if (this.y < 0 || this.y > height) this.vy *= -1;
-        }
-        draw() {
-          if (this.isSymbol) {
-            ctx.fillStyle = `rgba(37, 99, 235, ${this.opacity * 0.8})`;
-            ctx.font = '14px "Segoe UI", sans-serif';
-            ctx.fillText(this.symbol, this.x, this.y);
-          } else {
-            ctx.beginPath();
-            ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(2, 132, 199, ${this.opacity})`;
-            ctx.fill();
-          }
-        }
-      }
-
-      for (let i = 0; i < 50; i++) particles.push(new Particle());
-
-      function animate() {
-        ctx.clearRect(0, 0, width, height);
-        for (let i = 0; i < particles.length; i++) {
-          for (let j = i + 1; j < particles.length; j++) {
-            const dx = particles[i].x - particles[j].x;
-            const dy = particles[i].y - particles[j].y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 110) {
-              ctx.strokeStyle = `rgba(37, 99, 235, ${0.12 * (1 - dist / 110)})`;
-              ctx.lineWidth = 0.8;
-              ctx.beginPath();
-              ctx.moveTo(particles[i].x, particles[i].y);
-              ctx.lineTo(particles[j].x, particles[j].y);
-              ctx.stroke();
-            }
-          }
-        }
-        particles.forEach(p => { p.update(); p.draw(); });
-        requestAnimationFrame(animate);
-      }
-      animate();
-    })();
-
-    /* ================= 2. API 通訊與身份校驗 ================= */
+    /* ================= 1. API 通訊與極速身分校驗 ================= */
     async function callGasApi(action, data = {}) {
       const response = await fetch(GAS_API_URL, {
         method: 'POST',
@@ -1257,9 +1200,9 @@
 
         updateHudUI(currentUserProfile);
         applyExamConfigUI(currentExamConfig);
-        renderGroupedCategories(res.categories);
+        renderBackendGroupedCategories(res.categoryGroups || []);
+        renderPromotionActivities(res.activities || []);
 
-        // 教師顯示按鈕，不再自動彈窗
         if (currentUserProfile.isTeacher) {
           document.getElementById('btnTeacherPanelShortcut').style.display = 'inline-flex';
         }
@@ -1282,9 +1225,9 @@
       document.getElementById('hudLevel').textContent = profile.level ? ('LV.' + profile.level) : '';
       document.getElementById('hudTitle').textContent = profile.title || '';
 
-      if (profile.avatarBase64) {
-        document.getElementById('hudAvatarImg').src = profile.avatarBase64;
-      }
+      // 頭像採用 icons/icon_{i}.png
+      const avatarStyle = profile.avatarStyle || 'icon_1';
+      document.getElementById('hudAvatarImg').src = `icons/${avatarStyle}.png`;
     }
 
     function checkMoreTheMerrierOnLogin() {
@@ -1311,14 +1254,12 @@
       }
     }
 
-    // 需求 1：慶典橫幅判定顯示
     function applyExamConfigUI(config) {
       const modeInput = document.getElementById('examRoomInput');
       const modeLabel = document.getElementById('examRoomLabel');
       const slider = document.getElementById('countSlider');
       const sliderVal = document.getElementById('sliderValue');
 
-      // 慶典加乘橫幅 (若 A5 不是 1 則顯示)
       const festivalBanner = document.getElementById('festivalBanner');
       if (config.lotteryMultiplier && config.lotteryMultiplier !== 1 && config.lotteryMultiplier > 1) {
         document.getElementById('festivalMultiplierVal').textContent = config.lotteryMultiplier;
@@ -1356,6 +1297,55 @@
       }
     }
 
+    /* ================= 2. 近期活動渲染 ================= */
+    function renderPromotionActivities(activities) {
+      const section = document.getElementById('recentActivitiesSection');
+      const container = document.getElementById('activitiesListContainer');
+      container.innerHTML = '';
+
+      if (!activities || activities.length === 0) {
+        section.style.display = 'none';
+        return;
+      }
+
+      activities.forEach(act => {
+        const card = document.createElement('div');
+        card.className = 'activity-card';
+
+        const titleDiv = document.createElement('div');
+        titleDiv.className = 'activity-title';
+        titleDiv.textContent = act.title;
+
+        const posterBox = document.createElement('div');
+        posterBox.className = 'activity-poster-box';
+        posterBox.title = act.rulesUrl ? '點擊海報檢視章程詳情' : act.title;
+
+        const img = document.createElement('img');
+        img.src = act.posterUrl;
+        img.alt = act.title;
+        img.loading = 'lazy';
+
+        posterBox.appendChild(img);
+
+        if (act.rulesUrl) {
+          const hint = document.createElement('div');
+          hint.className = 'activity-hint';
+          hint.textContent = '🔗 點擊海報開啟章程';
+          posterBox.appendChild(hint);
+
+          posterBox.onclick = () => {
+            window.open(act.rulesUrl, '_blank');
+          };
+        }
+
+        card.appendChild(titleDiv);
+        card.appendChild(posterBox);
+        container.appendChild(card);
+      });
+
+      section.style.display = 'block';
+    }
+
     /* ================= 3. 教師專屬：模式控制面板 ================= */
     function openTeacherControlPanelWindow() {
       const panelWin = window.open('', '_blank', 'width=980,height=820');
@@ -1365,7 +1355,7 @@
       }
 
       const cfg = currentExamConfig || {};
-      const allCats = cfg.allConfigCategories || GROUP_DEFINITIONS.flatMap(g => g.items);
+      const allCats = cfg.allConfigCategories || [];
       const lockedCats = cfg.lockedCategories || [];
       const currentIsOpen = cfg.isExamMode ? 1 : 0;
       const currentExamName = cfg.examName !== '日常練習' ? cfg.examName : '第1段數學AI能力測驗';
@@ -1385,10 +1375,8 @@
     .panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #1f2937; padding-bottom: 20px; margin-bottom: 28px; }
     .panel-title { font-size: 1.6rem; font-weight: 800; color: #38bdf8; letter-spacing: -0.5px; }
     .panel-badge { font-size: 0.8rem; background: #0369a1; color: #e0f2fe; padding: 4px 10px; border-radius: 999px; font-weight: 800; }
-    
     .form-item { margin-bottom: 26px; }
     .form-label { display: block; font-size: 0.95rem; font-weight: 700; color: #94a3b8; margin-bottom: 10px; }
-    
     .ios-switch-box { display: flex; align-items: center; gap: 14px; }
     .ios-switch { position: relative; display: inline-block; width: 56px; height: 32px; }
     .ios-switch input { opacity: 0; width: 0; height: 0; }
@@ -1397,21 +1385,17 @@
     input:checked + .slider-toggle { background-color: #10b981; }
     input:checked + .slider-toggle:before { transform: translateX(24px); }
     .switch-status-text { font-weight: 800; font-size: 1.05rem; color: #cbd5e1; }
-
     .input-dark { width: 100%; background: #1e293b; border: 1.5px solid #334155; color: #f8fafc; padding: 12px 16px; border-radius: 12px; font-size: 1rem; font-weight: 600; outline: none; transition: all 0.2s; }
     .input-dark:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); }
-    
     .range-box { display: flex; align-items: center; gap: 18px; }
     .slider-dark { flex: 1; height: 8px; border-radius: 4px; background: #334155; outline: none; -webkit-appearance: none; }
     .slider-dark::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: #38bdf8; cursor: pointer; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
     .slider-val-badge { background: #0369a1; color: #ffffff; padding: 6px 16px; border-radius: 10px; font-weight: 800; font-size: 1.1rem; min-width: 70px; text-align: center; }
-
     .matrix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-top: 8px; }
     .matrix-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: #cbd5e1; transition: all 0.2s; }
     .matrix-item:hover { border-color: #38bdf8; }
     .matrix-item.checked { background: rgba(56, 189, 248, 0.12); border-color: #38bdf8; color: #38bdf8; }
     .matrix-item input { accent-color: #38bdf8; width: 16px; height: 16px; }
-
     .btn-submit-panel { width: 100%; margin-top: 32px; padding: 16px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; border: none; border-radius: 14px; font-size: 1.15rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35); transition: all 0.2s; }
     .btn-submit-panel:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(2, 132, 199, 0.5); }
   </style>
@@ -1541,8 +1525,8 @@
       panelWin.document.close();
     }
 
-    /* ================= 4. 頭像與個人設定面板 ================= */
-    async function openProfileModal(isMandatory = false) {
+    /* ================= 4. 個人頭像設定 (icons/ 目錄直連) ================= */
+    function openProfileModal(isMandatory = false) {
       const modal = document.getElementById('profileModal');
       const cancelBtn = document.getElementById('btnCancelProfile');
       const titleElem = document.getElementById('modalTitle');
@@ -1559,52 +1543,41 @@
       }
 
       document.getElementById('inputModalNickname').value = currentUserProfile.nickname || '';
-      selectedAvatarStyle = currentUserProfile.avatarStyle || '';
+      selectedAvatarStyle = currentUserProfile.avatarStyle || 'icon_1';
 
+      renderLocalAvatarMatrix();
       modal.style.display = 'flex';
-
-      if (availableAvatars.length === 0) {
-        try {
-          const res = await callGasApi('getAvatars');
-          availableAvatars = res.avatars || [];
-          if (!selectedAvatarStyle && availableAvatars[0]) {
-            selectedAvatarStyle = availableAvatars[0].style;
-          }
-          renderAvatarMatrix();
-        } catch (err) {
-          document.getElementById('avatarMatrixContainer').innerHTML = '<div style="color:var(--danger); grid-column:1/-1;">頭像載入失敗</div>';
-        }
-      } else {
-        renderAvatarMatrix();
-      }
     }
 
     function closeProfileModal() {
       document.getElementById('profileModal').style.display = 'none';
     }
 
-    function renderAvatarMatrix() {
+    // 零 API 請求：直接循環渲染本地 20 張頭像
+    function renderLocalAvatarMatrix() {
       const container = document.getElementById('avatarMatrixContainer');
       container.innerHTML = '';
 
-      availableAvatars.forEach(av => {
+      for (let i = 1; i <= 20; i++) {
+        const iconKey = `icon_${i}`;
         const item = document.createElement('div');
-        item.className = 'avatar-matrix-item' + (av.style === selectedAvatarStyle ? ' selected' : '');
-        item.title = av.style;
+        item.className = 'avatar-matrix-item' + (iconKey === selectedAvatarStyle ? ' selected' : '');
+        item.title = `頭像 ${i}`;
 
         const img = document.createElement('img');
-        img.src = av.base64;
-        img.alt = av.style;
+        img.src = `icons/${iconKey}.png`;
+        img.alt = iconKey;
+        img.loading = 'lazy';
         item.appendChild(img);
 
         item.addEventListener('click', () => {
           container.querySelectorAll('.avatar-matrix-item').forEach(el => el.classList.remove('selected'));
           item.classList.add('selected');
-          selectedAvatarStyle = av.style;
+          selectedAvatarStyle = iconKey;
         });
 
         container.appendChild(item);
-      });
+      }
     }
 
     async function handleConfirmProfileSave() {
@@ -1633,7 +1606,7 @@
       }
     }
 
-    /* ================= 5. 防作弊監控與阻斷警告 ================= */
+    /* ================= 5. 防作弊監控 ================= */
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && isQuizActive && !isViolationModalOpen) {
         recordViolation('切換瀏覽器分頁或視窗最小化');
@@ -1691,37 +1664,22 @@
       });
     });
 
-    function renderGroupedCategories(availableSheets) {
+    // 接收後端安全下發之模組群組，無任何前端硬編碼敏感結構
+    function renderBackendGroupedCategories(groups) {
       const container = document.getElementById('categoryGroupContainer');
       container.innerHTML = '';
 
-      if (!availableSheets || availableSheets.length === 0) {
+      if (!groups || groups.length === 0) {
         container.innerHTML = '<div style="color:var(--danger); font-weight: bold;">未偵測到題目分頁！</div>';
         return;
       }
 
-      const matchedSheets = new Set();
       let firstAssigned = false;
-
-      GROUP_DEFINITIONS.forEach(group => {
-        const currentGroupSheets = group.items.filter(item => {
-          const exists = availableSheets.includes(item);
-          if (exists) matchedSheets.add(item);
-          return exists;
-        });
-
-        if (currentGroupSheets.length > 0) {
-          const block = createGroupBlock(group.id, group.title, group.subtitle, currentGroupSheets, !firstAssigned);
-          if (!firstAssigned) firstAssigned = true;
-          container.appendChild(block);
-        }
+      groups.forEach(group => {
+        const block = createGroupBlock(group.id, group.title, group.subtitle, group.items, !firstAssigned);
+        if (!firstAssigned) firstAssigned = true;
+        container.appendChild(block);
       });
-
-      const extraSheets = availableSheets.filter(sheet => !matchedSheets.has(sheet));
-      if (extraSheets.length > 0) {
-        const extraBlock = createGroupBlock('other', '📌 其他延伸主題', '自訂進階練習題庫', extraSheets, false);
-        container.appendChild(extraBlock);
-      }
     }
 
     function createGroupBlock(groupId, title, subtitle, items, shouldSelectFirst) {
@@ -1825,7 +1783,7 @@
         totalCount = 60;
       }
 
-      showLoading(true, '⚡ 正在為您配置題目中...');
+      showLoading(true, '⚡ 正在為您智慧配置考卷中...');
 
       try {
         const res = await callGasApi('generateQuiz', { selectedCategories: selectedCats, totalCount: totalCount });
@@ -1845,47 +1803,47 @@
     }
 
     function renderQuiz(questions) {
-	  const container = document.getElementById('questionsScrollContainer');
-	  container.innerHTML = '';
-	  Object.keys(userAnswers).forEach(key => delete userAnswers[key]);
+      const container = document.getElementById('questionsScrollContainer');
+      container.innerHTML = '';
+      Object.keys(userAnswers).forEach(key => delete userAnswers[key]);
 
-	  updateProgressBar(0, questions.length);
+      updateProgressBar(0, questions.length);
 
-	  const letters = ['A', 'B', 'C', 'D'];
-	  questions.forEach((q, qIndex) => {
-		const card = document.createElement('div');
-		card.className = 'question-card';
-		card.id = `qCard_${qIndex}`;
+      const letters = ['A', 'B', 'C', 'D'];
+      questions.forEach((q, qIndex) => {
+        const card = document.createElement('div');
+        card.className = 'question-card';
+        card.id = `qCard_${qIndex}`;
 
-		let optionsHtml = '';
-		q.options.forEach((optRaw, optIdx) => {
-		  const letter = letters[optIdx];
-		  const optText = getOptionText(optRaw);
+        let optionsHtml = '';
+        q.options.forEach((optRaw, optIdx) => {
+          const letter = letters[optIdx];
+          const optText = getOptionText(optRaw);
 
-		  optionsHtml += `
-			<div class="option-item" onclick="selectOption(${qIndex}, '${letter}', this)">
-			  <div class="option-circle">${letter}</div>
-			  <div class="option-text">${escapeHtml(optText)}</div>
-			</div>
-		  `;
-		});
+          optionsHtml += `
+            <div class="option-item" onclick="selectOption(${qIndex}, '${letter}', this)">
+              <div class="option-circle">${letter}</div>
+              <div class="option-text">${escapeHtml(optText)}</div>
+            </div>
+          `;
+        });
 
-		card.innerHTML = `
-		  <div class="q-meta">
-			<span class="q-category-tag">📂 ${escapeHtml(q.category)}</span>
-			<span class="q-counter">第 ${qIndex + 1} 題 / 共 ${questions.length} 題</span>
-		  </div>
-		  <div class="q-content">${formatPythonQuestion(q.question)}</div>
-		  <div class="options-list">${optionsHtml}</div>
-		`;
-		container.appendChild(card);
-	  });
+        card.innerHTML = `
+          <div class="q-meta">
+            <span class="q-category-tag">📂 ${escapeHtml(q.category)}</span>
+            <span class="q-counter">第 ${qIndex + 1} 題 / 共 ${questions.length} 題</span>
+          </div>
+          <div class="q-content">${formatPythonQuestion(q.question)}</div>
+          <div class="options-list">${optionsHtml}</div>
+        `;
+        container.appendChild(card);
+      });
 
-	  document.getElementById('setupView').style.display = 'none';
-	  document.getElementById('mistakeBankView').style.display = 'none';
-	  document.getElementById('quizView').style.display = 'block';
-	  window.scrollTo({ top: 0, behavior: 'smooth' });
-	}
+      document.getElementById('setupView').style.display = 'none';
+      document.getElementById('mistakeBankView').style.display = 'none';
+      document.getElementById('quizView').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
 
     function selectOption(qIndex, letter, elem) {
       userAnswers[qIndex] = letter;
@@ -1903,7 +1861,7 @@
       document.getElementById('energyBarFill').style.width = `${percent}%`;
     }
 
-    /* ================= 7. 個人錯題庫系統 (需求 7) ================= */
+    /* ================= 7. 個人錯題庫重溫 ================= */
     async function openMistakeBankView() {
       document.getElementById('setupView').style.display = 'none';
       document.getElementById('mistakeBankView').style.display = 'block';
@@ -1943,7 +1901,7 @@
       }
 
       const letters = ['A', 'B', 'C', 'D'];
-      data.questions.forEach((q, idx) => {
+      data.questions.forEach((q) => {
         const card = document.createElement('div');
         card.className = 'wrong-item';
 
@@ -1973,8 +1931,8 @@
           <div style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 6px;">
             [${escapeHtml(q.category)}] 題號：${escapeHtml(q.id)}
           </div>
-          <div style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; line-height: 1.5;">
-            ${escapeHtml(q.question)}
+          <div class="q-content" style="font-size: 1.05rem; margin-bottom: 8px;">
+            ${formatPythonQuestion(q.question)}
           </div>
           ${optionsHtml}
           <div class="explanation-container">
@@ -2047,14 +2005,14 @@
         showLoading(false);
         alert(res.message || '重置成功！');
         closeResetMistakeModal();
-        openMistakeBankView(); // 刷新錯題頁面
+        openMistakeBankView();
       } catch (err) {
         showLoading(false);
         alert('重置失敗：' + err.message);
       }
     }
 
-    /* ================= 8. 交卷、抽獎與事件判定鏈條 ================= */
+    /* ================= 8. 交卷、抽獎與事件判定 ================= */
     async function handleSubmitQuizWithRetry() {
       const total = currentQuizData.length;
       const answeredCount = Object.keys(userAnswers).length;
@@ -2100,7 +2058,6 @@
           const res = await callGasApi('submitQuiz', { payload: payload });
           localStorage.removeItem('AIMATH_UNSUBMITTED_BACKUP');
           renderResult(res.result);
-          
           startPostSubmissionPipeline(res.result);
           return;
         } catch (err) {
@@ -2198,8 +2155,8 @@
             <div style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 6px;">
               [${escapeHtml(item.category)}] 題號：${escapeHtml(item.id)}
             </div>
-            <div style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 8px; line-height: 1.5;">
-              ${escapeHtml(item.question)}
+            <div class="q-content" style="font-size: 1.05rem; margin-bottom: 8px;">
+              ${formatPythonQuestion(item.question)}
             </div>
             ${optionsReviewHtml}
             <div class="explanation-container">
@@ -2327,7 +2284,6 @@
       }
     }
 
-    /* 需求 3 & 5：「心想事成」自選黃色高亮樣式 + 知識的共鳴 */
     let chosenWish = 'meteor';
     function openWishesModal() {
       document.getElementById('wishesModal').style.display = 'flex';
@@ -2346,7 +2302,6 @@
       } else if (chosenWish === 'more') {
         openInteractiveActionModal('more_the_merrier');
       } else if (chosenWish === 'knowledge') {
-        // 增益：知識的共鳴 (作用於自身)
         showLoading(true, '📖 正在與知識產生共鳴...');
         try {
           const res = await callGasApi('triggerGameEvent', { eventType: 'knowledge_resonance' });
@@ -2427,7 +2382,6 @@
         showLoading(false);
         alert(res.message || '發送成功！');
         document.getElementById('interactiveActionModal').style.display = 'none';
-        
         processNextPendingNotice();
       } catch (err) {
         showLoading(false);
@@ -2435,7 +2389,6 @@
       }
     }
 
-    // 需求 2 & 3：確認閱讀後自動向後台清空記錄，杜絕重複提醒
     function processNextPendingNotice() {
       if (activePendingQueue.length === 0) return;
       const item = activePendingQueue.shift();
@@ -2455,7 +2408,6 @@
         replyBtn.textContent = '✍️ 回應「眾裡尋他傳聲筒」';
         replyBtn.onclick = () => {
           modal.style.display = 'none';
-          // 確認收到並銷毀
           callGasApi('clearUserNotice', { noticeType: 'megaphone' });
           openInteractiveActionModal('lookback', item.replyToClass, item.replyToName);
         };
@@ -2575,29 +2527,22 @@
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
     }
-	
-	// 自動將單行代碼與分號轉化為標準多行與縮排排版
-	function formatPythonQuestion(rawText) {
-	  if (!rawText) return '';
-	  var text = String(rawText);
 
-	  // 1. 若題目以分號 ; 串接多個語句，自動轉為換行
-	  if (text.indexOf(';') !== -1 && (text.indexOf('print') !== -1 || text.indexOf('=') !== -1 || text.indexOf('while') !== -1 || text.indexOf('for') !== -1 || text.indexOf('pass') !== -1)) {
-		text = text.replace(/;\s*/g, '\n');
-	  }
+    function formatPythonQuestion(rawText) {
+      if (!rawText) return '';
+      var text = String(rawText);
 
-	  // 2. 處理單行 if-else 語句（如 if 0: print(...) else: ...）
-	  text = text.replace(/:\s*(print\([^\)]+\)|pass|continue|break)\s+else:/g, ':\n    $1\nelse:');
-	  text = text.replace(/else:\s*(print\([^\)]+\)|pass)/g, 'else:\n    $1');
+      if (text.indexOf(';') !== -1 && (text.indexOf('print') !== -1 || text.indexOf('=') !== -1 || text.indexOf('while') !== -1 || text.indexOf('for') !== -1 || text.indexOf('pass') !== -1)) {
+        text = text.replace(/;\s*/g, '\n');
+      }
 
-	  // 3. 處理單行 for / while 複合語句（如 for ...: if ...:）
-	  text = text.replace(/(for\s+[^:]+:)\s*(if\s+[^:]+:)/g, '$1\n    $2');
-	  text = text.replace(/(if\s+[^:]+:)\s*(continue|break|pass)/g, '$1\n        $2');
+      text = text.replace(/:\s*(print\([^\)]+\)|pass|continue|break)\s+else:/g, ':\n    $1\nelse:');
+      text = text.replace(/else:\s*(print\([^\)]+\)|pass)/g, 'else:\n    $1');
+      text = text.replace(/(for\s+[^:]+:)\s*(if\s+[^:]+:)/g, '$1\n    $2');
+      text = text.replace(/(if\s+[^:]+:)\s*(continue|break|pass)/g, '$1\n        $2');
 
-	  // 4. 安全轉義 HTML 字元，同時保留 \n 換行與縮排空格
-	  return escapeHtml(text);
-	}
-	
+      return escapeHtml(text);
+    }
   </script>
 </body>
 </html>
