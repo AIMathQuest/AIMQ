@@ -465,26 +465,9 @@
       color: #0f172a;
       line-height: 1.6;
       margin-bottom: 18px;
-      word-break: break-word;
-    }
-
-    /* 終端機風格代碼區塊 (選項 B) */
-    .python-code-box {
-      display: block;
-      background: #0f172a;
-      color: #38bdf8;
-      font-family: 'Consolas', 'Roboto Mono', 'Fira Code', 'Courier New', monospace;
-      font-size: 0.96rem;
-      font-weight: 500;
-      line-height: 1.6;
-      padding: 14px 18px;
-      border-radius: 12px;
-      margin: 12px 0;
-      border: 1px solid #1e293b;
-      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.35);
       white-space: pre-wrap;
       word-break: break-word;
-      overflow-x: auto;
+      font-family: 'Consolas', 'Roboto Mono', 'Fira Code', 'Courier New', monospace;
     }
 
     .options-list { display: flex; flex-direction: column; gap: 10px; }
@@ -843,7 +826,7 @@
     </div>
   </div>
 
-  <!-- 暱稱與頭像設定 Modal -->
+  <!-- 暱稱與頭像設定 Modal (直接讀取 icons/ 目錄，零 API 消耗) -->
   <div id="profileModal" class="modal-overlay">
     <div class="modal-card">
       <h3 id="modalTitle" style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
@@ -1241,12 +1224,7 @@
       document.getElementById('hudLevel').textContent = profile.level ? ('LV.' + profile.level) : '';
       document.getElementById('hudTitle').textContent = profile.title || '';
 
-      // 防禦性轉譯：相容舊版存入的「頭像1」或純數字
-      let avatarStyle = profile.avatarStyle || 'icon_1';
-      if (!avatarStyle.startsWith('icon_')) {
-        const num = avatarStyle.replace(/[^0-9]/g, '');
-        avatarStyle = num ? `icon_${num}` : 'icon_1';
-      }
+      const avatarStyle = profile.avatarStyle || 'icon_1';
       document.getElementById('hudAvatarImg').src = `icons/${avatarStyle}.png`;
     }
 
@@ -1801,7 +1779,7 @@
         totalCount = 60;
       }
 
-      showLoading(true, '⚡ 正在為您配置題目中...');
+      showLoading(true, '⚡ 正在為您智慧配置考卷中...');
 
       try {
         const res = await callGasApi('generateQuiz', { selectedCategories: selectedCats, totalCount: totalCount });
@@ -1879,7 +1857,7 @@
       document.getElementById('energyBarFill').style.width = `${percent}%`;
     }
 
-    /* ================= 7. 個人錯題庫系統 ================= */
+    /* ================= 7. 個人錯題庫重溫 ================= */
     async function openMistakeBankView() {
       document.getElementById('setupView').style.display = 'none';
       document.getElementById('mistakeBankView').style.display = 'block';
@@ -2055,10 +2033,10 @@
         examRoom: document.getElementById('examRoomInput').value.trim() || '日常練習',
         violationCount: violationCount,
         violationLogs: violationLogs.join('；') || '無異常',
-        answers: currentQuizData.map((q, idx) => ({
+        answers: currentQuizData.map(q => ({
           sheetName: q.sheetName,
           row: q.row,
-          choice: userAnswers[idx] || ''
+          choice: userAnswers[currentQuizData.indexOf(q)] || ''
         }))
       };
 
@@ -2546,7 +2524,6 @@
         .replace(/'/g, "&#039;");
     }
 
-    // 選項 B 啟用：將 Python 程式碼轉譯並封裝進終端機框
     function formatPythonQuestion(rawText) {
       if (!rawText) return '';
       var text = String(rawText);
@@ -2560,11 +2537,6 @@
       text = text.replace(/(for\s+[^:]+:)\s*(if\s+[^:]+:)/g, '$1\n    $2');
       text = text.replace(/(if\s+[^:]+:)\s*(continue|break|pass)/g, '$1\n        $2');
 
-      const isPythonCode = text.includes('\n') || text.includes('print(') || text.includes('def ') || text.includes('import ') || text.includes('for ') || text.includes('while ') || text.includes('==');
-
-      if (isPythonCode) {
-        return `<div class="python-code-box">${escapeHtml(text)}</div>`;
-      }
       return escapeHtml(text);
     }
   </script>
