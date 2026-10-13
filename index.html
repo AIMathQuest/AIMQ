@@ -14,6 +14,8 @@
       --accent-gold: #f59e0b;
       --success: #10b981;
       --danger: #ef4444;
+      --study-theme: #0d9488;
+      --study-hover: #0f766e;
       --bg-page: #f1f5f9;
       --card-bg: #ffffff;
       --text-main: #1e293b;
@@ -805,6 +807,71 @@
       font-weight: 700;
       backdrop-filter: blur(4px);
     }
+
+    /* 📚 學習特定課題專用樣式 */
+    .study-topic-chip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      border-radius: 12px;
+      background: #f8fafc;
+      border: 2px solid var(--border-color);
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 0.94rem;
+      color: #334155;
+      transition: all 0.2s ease;
+    }
+    .study-topic-chip:hover {
+      border-color: var(--study-theme);
+      background: #f0fdfa;
+      transform: translateY(-1px);
+    }
+    .study-topic-chip.selected {
+      background: #f0fdfa !important;
+      border-color: var(--study-theme) !important;
+      color: var(--study-hover) !important;
+      box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.22);
+      font-weight: 800;
+    }
+    .study-radio-icon {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 2px solid #cbd5e1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .study-topic-chip.selected .study-radio-icon {
+      border-color: var(--study-theme);
+      background: var(--study-theme);
+    }
+    .study-radio-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: none;
+    }
+    .study-topic-chip.selected .study-radio-dot {
+      display: block;
+    }
+
+    .study-item-card {
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 20px;
+      border-left: 5px solid var(--study-theme);
+      border-top: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03);
+    }
   </style>
 </head>
 <body>
@@ -827,7 +894,7 @@
     </div>
   </div>
 
-  <!-- 暱稱與頭像設定 Modal (直接讀取 icons/ 目錄，零 API 消耗) -->
+  <!-- 暱稱與頭像設定 Modal -->
   <div id="profileModal" class="modal-overlay">
     <div class="modal-card">
       <h3 id="modalTitle" style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
@@ -964,6 +1031,28 @@
     </div>
   </div>
 
+  <!-- ✅ 優化 2：選擇欲研讀之特定課題 Modal (矩陣式單選) -->
+  <div id="topicSelectModal" class="modal-overlay">
+    <div class="modal-card" style="max-width: 620px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a;">
+          📚 學習特定課題
+        </h3>
+        <span style="font-size: 0.82rem; font-weight: 800; color: var(--study-theme); background: #ccfbf1; padding: 4px 10px; border-radius: 999px;">單選課題</span>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 16px;">
+        請從下方矩陣點選一個您目前想深入研讀的課題：
+      </p>
+
+      <div id="studyTopicMatrixContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; max-height: 290px; overflow-y: auto; padding: 4px; margin-bottom: 22px;"></div>
+
+      <div style="display: flex; gap: 12px;">
+        <button class="btn-campus" style="background: #e2e8f0; color: #334155; box-shadow: none;" onclick="closeTopicSelectModal()">取消</button>
+        <button class="btn-campus" style="background: linear-gradient(135deg, var(--study-theme) 0%, var(--study-hover) 100%); box-shadow: 0 4px 14px rgba(13, 148, 136, 0.28);" onclick="handleConfirmTopicStudy()">確認研讀該課題</button>
+      </div>
+    </div>
+  </div>
+
   <div class="app-container">
     <div id="festivalBanner" class="festival-banner">
       🎉 慶典進行中，目前抽獎加乘倍數：<span id="festivalMultiplierVal">1</span> 倍！
@@ -1000,7 +1089,7 @@
       </p>
     </div>
 
-    <!-- 步驟 1：客製設定介面 -->
+    <!-- 步驟 1：客製設定介面 (自定義練習主頁) -->
     <div id="setupView" style="display: none;">
       <div class="campus-card">
         <div class="user-hud-bar">
@@ -1047,6 +1136,13 @@
           <button id="btnStart" class="btn-campus" style="flex: 2;" onclick="handleStartQuiz()">🚀 隨機生成題目</button>
           <button id="btnOpenMistakes" class="btn-campus" style="flex: 1; background: linear-gradient(135deg, #475569 0%, #334155 100%); box-shadow: 0 4px 12px rgba(51, 65, 85, 0.25);" onclick="openMistakeBankView()">📖 個人錯題庫</button>
         </div>
+
+        <!-- ✅ 優化 2：主頁最下方「學習特定課題」專屬按鈕 -->
+        <div style="margin-top: 14px;">
+          <button id="btnStudyTopic" class="btn-campus" style="background: linear-gradient(135deg, var(--study-theme) 0%, var(--study-hover) 100%); box-shadow: 0 4px 14px rgba(13, 148, 136, 0.28);" onclick="openTopicSelectModal()">
+            📚 學習特定課題
+          </button>
+        </div>
       </div>
 
       <!-- 近期活動推廣區 -->
@@ -1075,6 +1171,31 @@
 
         <div style="margin-top: 26px;">
           <button class="btn-campus" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);" onclick="closeMistakeBankView()">🔙 返回自定義練習</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ 優化 2：步驟 1.6：學習特定課題專屬頁面 (題目 + 正解 + 解說) -->
+    <div id="topicStudyView" style="display: none;">
+      <div class="campus-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--border-color); padding-bottom: 14px; margin-bottom: 18px;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <span style="font-size: 1.5rem;">📚</span>
+              <h2 id="topicStudyTitle" style="font-size: 1.45rem; font-weight: 800; color: #0f172a;">課題全題研讀</h2>
+            </div>
+            <p id="topicStudySubtitle" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">標準答案、完整選項與深度詳解自主學習</p>
+          </div>
+          <span id="topicStudyCountBadge" style="background: #ccfbf1; color: var(--study-hover); font-weight: 800; font-size: 0.88rem; padding: 6px 14px; border-radius: 999px;">共 0 題</span>
+        </div>
+
+        <div id="topicStudyCardsContainer">
+          <div style="text-align: center; color: var(--text-muted); padding: 40px;">正在讀取課題全量題庫...</div>
+        </div>
+
+        <!-- 頁面最下方配置返回按鈕 -->
+        <div style="margin-top: 26px;">
+          <button class="btn-campus" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);" onclick="closeTopicStudyView()">🔙 返回自定義練習</button>
         </div>
       </div>
     </div>
@@ -1161,6 +1282,8 @@
     let currentActionType = '';
 
     let currentMistakeBankData = null;
+    let cachedCategoryGroups = [];
+    let selectedStudyCategory = '';
 
     /* ================= 1. API 通訊與極速身分校驗 ================= */
     async function callGasApi(action, data = {}) {
@@ -1194,13 +1317,14 @@
 
         currentUserProfile = res.userProfile;
         currentExamConfig = res.examConfig || { isExamMode: false, examName: '日常練習', lockedCategories: [] };
+        cachedCategoryGroups = res.categoryGroups || [];
 
         document.getElementById('authView').style.display = 'none';
         document.getElementById('setupView').style.display = 'block';
 
         updateHudUI(currentUserProfile);
         applyExamConfigUI(currentExamConfig);
-        renderBackendGroupedCategories(res.categoryGroups || []);
+        renderBackendGroupedCategories(cachedCategoryGroups);
         renderPromotionActivities(res.activities || []);
 
         if (currentUserProfile.isTeacher) {
@@ -1225,7 +1349,6 @@
       document.getElementById('hudLevel').textContent = profile.level ? ('LV.' + profile.level) : '';
       document.getElementById('hudTitle').textContent = profile.title || '';
 
-      // 頭像採用 icons/icon_{i}.png
       const avatarStyle = profile.avatarStyle || 'icon_1';
       document.getElementById('hudAvatarImg').src = `icons/${avatarStyle}.png`;
     }
@@ -1525,7 +1648,7 @@
       panelWin.document.close();
     }
 
-    /* ================= 4. 個人頭像設定 (icons/ 目錄直連) ================= */
+    /* ================= 4. 個人檔案設定 ================= */
     function openProfileModal(isMandatory = false) {
       const modal = document.getElementById('profileModal');
       const cancelBtn = document.getElementById('btnCancelProfile');
@@ -1553,7 +1676,6 @@
       document.getElementById('profileModal').style.display = 'none';
     }
 
-    // 零 API 請求：直接循環渲染本地 20 張頭像
     function renderLocalAvatarMatrix() {
       const container = document.getElementById('avatarMatrixContainer');
       container.innerHTML = '';
@@ -1664,7 +1786,6 @@
       });
     });
 
-    // 接收後端安全下發之模組群組，無任何前端硬編碼敏感結構
     function renderBackendGroupedCategories(groups) {
       const container = document.getElementById('categoryGroupContainer');
       container.innerHTML = '';
@@ -1841,6 +1962,7 @@
 
       document.getElementById('setupView').style.display = 'none';
       document.getElementById('mistakeBankView').style.display = 'none';
+      document.getElementById('topicStudyView').style.display = 'none';
       document.getElementById('quizView').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
@@ -1864,6 +1986,7 @@
     /* ================= 7. 個人錯題庫重溫 ================= */
     async function openMistakeBankView() {
       document.getElementById('setupView').style.display = 'none';
+      document.getElementById('topicStudyView').style.display = 'none';
       document.getElementById('mistakeBankView').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -2012,7 +2135,154 @@
       }
     }
 
-    /* ================= 8. 交卷、抽獎與事件判定 ================= */
+    /* ================= 8. 學習特定課題 (單選矩陣 + 題目正解詳解研讀) ================= */
+    function openTopicSelectModal() {
+      const container = document.getElementById('studyTopicMatrixContainer');
+      container.innerHTML = '';
+      selectedStudyCategory = '';
+
+      // 匯總所有可用課題清單
+      const allAvailableCats = [];
+      if (cachedCategoryGroups && cachedCategoryGroups.length > 0) {
+        cachedCategoryGroups.forEach(grp => {
+          if (grp.items) {
+            grp.items.forEach(c => {
+              if (!allAvailableCats.includes(c)) allAvailableCats.push(c);
+            });
+          }
+        });
+      }
+
+      if (allAvailableCats.length === 0) {
+        alert('目前未載入任何課題！');
+        return;
+      }
+
+      // 預設選中首個課題
+      selectedStudyCategory = allAvailableCats[0];
+
+      allAvailableCats.forEach(catName => {
+        const chip = document.createElement('div');
+        chip.className = 'study-topic-chip' + (catName === selectedStudyCategory ? ' selected' : '');
+        chip.innerHTML = `
+          <div class="study-radio-icon">
+            <div class="study-radio-dot"></div>
+          </div>
+          <span>${escapeHtml(catName)}</span>
+        `;
+
+        chip.addEventListener('click', () => {
+          container.querySelectorAll('.study-topic-chip').forEach(el => el.classList.remove('selected'));
+          chip.classList.add('selected');
+          selectedStudyCategory = catName;
+        });
+
+        container.appendChild(chip);
+      });
+
+      document.getElementById('topicSelectModal').style.display = 'flex';
+    }
+
+    function closeTopicSelectModal() {
+      document.getElementById('topicSelectModal').style.display = 'none';
+    }
+
+    async function handleConfirmTopicStudy() {
+      if (!selectedStudyCategory) {
+        alert('請點選一個欲研讀的課題！');
+        return;
+      }
+
+      closeTopicSelectModal();
+      showLoading(true, `📚 正在載入【${selectedStudyCategory}】全部題目與解答解析...`);
+
+      try {
+        const res = await callGasApi('getTopicStudyData', { category: selectedStudyCategory });
+        showLoading(false);
+        renderTopicStudyView(res.category, res.questions || []);
+      } catch (err) {
+        showLoading(false);
+        alert('載入課題失敗：' + err.message);
+      }
+    }
+
+    function renderTopicStudyView(categoryName, questions) {
+      document.getElementById('setupView').style.display = 'none';
+      document.getElementById('mistakeBankView').style.display = 'none';
+      document.getElementById('quizView').style.display = 'none';
+      document.getElementById('resultView').style.display = 'none';
+
+      document.getElementById('topicStudyTitle').textContent = `課題研讀：${categoryName}`;
+      document.getElementById('topicStudyCountBadge').textContent = `共 ${questions.length} 題`;
+
+      const container = document.getElementById('topicStudyCardsContainer');
+      container.innerHTML = '';
+
+      if (!questions || questions.length === 0) {
+        container.innerHTML = `
+          <div style="text-align: center; color: var(--text-muted); padding: 40px;">
+            ⚠️ 本課題暫無題目或正在整理中！
+          </div>
+        `;
+      } else {
+        const letters = ['A', 'B', 'C', 'D'];
+        questions.forEach((q, idx) => {
+          const card = document.createElement('div');
+          card.className = 'study-item-card';
+
+          let optionsHtml = '<div class="review-options-container">';
+          letters.forEach((letter, oIdx) => {
+            const optText = getOptionText(q.options ? q.options[oIdx] : '');
+            const isCorrect = (letter === q.correctAnswer);
+            let optClass = 'review-opt';
+            let flagHtml = '';
+
+            if (isCorrect) {
+              optClass += ' opt-correct';
+              flagHtml = '<span class="review-flag flag-correct">✅ 正確答案</span>';
+            }
+
+            optionsHtml += `
+              <div class="${optClass}">
+                <div class="review-circle">${letter}</div>
+                <div class="review-text">${escapeHtml(optText)}</div>
+                ${flagHtml}
+              </div>
+            `;
+          });
+          optionsHtml += '</div>';
+
+          card.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <span style="font-weight: 800; color: var(--study-theme); font-size: 0.95rem;">
+                第 ${idx + 1} 題（編號：${escapeHtml(q.id)}）
+              </span>
+              <span class="q-category-tag" style="background: #ccfbf1; color: var(--study-hover);">📂 ${escapeHtml(q.category)}</span>
+            </div>
+            <div class="q-content" style="font-size: 1.08rem; margin-bottom: 12px;">
+              ${formatPythonQuestion(q.question)}
+            </div>
+            ${optionsHtml}
+            <div class="explanation-container" style="background: #f0fdfa; border-left-color: var(--study-theme); color: #134e4a; margin-top: 14px;">
+              💡 <b>標準解析說明：</b><br>${escapeHtml(q.explanation)}
+            </div>
+          `;
+
+          container.appendChild(card);
+        });
+      }
+
+      document.getElementById('topicStudyView').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function closeTopicStudyView() {
+      document.getElementById('topicStudyView').style.display = 'none';
+      document.getElementById('setupView').style.display = 'block';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    /* ================= 9. 交卷、抽獎與事件判定 ================= */
     async function handleSubmitQuizWithRetry() {
       const total = currentQuizData.length;
       const answeredCount = Object.keys(userAnswers).length;
