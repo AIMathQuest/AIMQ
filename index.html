@@ -6,6 +6,8 @@
   <title>AIMathQuest</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- Chart.js 官方 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --primary: #2563eb;
@@ -52,7 +54,7 @@
     .app-container {
       position: relative;
       z-index: 1;
-      max-width: 840px;
+      max-width: 860px;
       margin: 24px auto;
       padding: 0 16px 80px 16px;
     }
@@ -82,7 +84,7 @@
     }
 
     .brand-title {
-      font-size: 2rem;
+      font-size: 2.1rem;
       font-weight: 800;
       color: #0f172a;
       letter-spacing: -0.5px;
@@ -451,7 +453,10 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
     }
+    .q-tags-group { display: flex; align-items: center; gap: 8px; }
     .q-category-tag {
       background: #e0f2fe;
       color: #0369a1;
@@ -460,7 +465,19 @@
       padding: 4px 10px;
       border-radius: 6px;
     }
+    .q-ability-tag {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      font-weight: 800;
+      font-size: 0.85rem;
+      padding: 3px 9px;
+      border-radius: 6px;
+    }
+
     .q-counter { font-weight: 800; font-size: 0.95rem; color: var(--secondary); }
+    
+    /* 修正題目與詳解文字顯示，去除預設邊距 */
     .q-content {
       font-size: 1.12rem;
       font-weight: 700;
@@ -470,6 +487,7 @@
       white-space: pre-wrap;
       word-break: break-word;
       font-family: 'Consolas', 'Roboto Mono', 'Fira Code', 'Courier New', monospace;
+      text-indent: 0 !important;
     }
 
     .options-list { display: flex; flex-direction: column; gap: 10px; }
@@ -538,6 +556,48 @@
     .stat-card-val { font-size: 1.7rem; font-weight: 900; color: var(--primary); }
     .stat-card-title { font-size: 0.85rem; font-weight: 700; color: var(--text-muted); margin-top: 4px; }
 
+    /* 大尺寸、獨立一行、防溢出之立體雷達圖卡片 */
+    .radar-academic-card {
+      background: linear-gradient(160deg, #ffffff 0%, #f0fdfa 45%, #f8fafc 100%);
+      border: 1.5px solid #cbd5e1;
+      border-radius: 24px;
+      padding: 32px 16px;
+      margin: 28px 0;
+      box-shadow: 0 20px 45px -10px rgba(15, 23, 42, 0.1), 0 0 0 1px rgba(226, 232, 240, 0.8);
+      position: relative;
+      overflow: visible;
+      text-align: center;
+    }
+    .radar-card-header {
+      border-bottom: 1.5px solid #e2e8f0;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .radar-main-title {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .radar-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-weight: 600;
+    }
+    .radar-full-container {
+      position: relative;
+      width: 100%;
+      max-width: 580px;
+      margin: 0 auto;
+      aspect-ratio: 1 / 1;
+      filter: drop-shadow(0 14px 28px rgba(37, 99, 235, 0.18));
+      padding: 10px;
+    }
+
     .wrong-item {
       background: #ffffff;
       border-radius: 16px;
@@ -588,6 +648,8 @@
     .review-flag { padding: 4px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; white-space: nowrap; }
     .flag-wrong { background: #fee2e2; color: #b91c1c; }
     .flag-correct { background: #dcfce7; color: #15803d; }
+    
+    /* 修正題目解析框：嚴格頂格對齊，消除開頭縮排 */
     .explanation-container {
       padding: 14px 16px;
       background: #f0f9ff;
@@ -598,7 +660,8 @@
       color: #0369a1;
       white-space: pre-wrap;
       word-break: break-word;
-      font-family: 'Consolas', 'Roboto Mono', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      text-indent: 0 !important;
     }
 
     .loader-box {
@@ -743,23 +806,18 @@
       border-color: #eab308 !important;
       box-shadow: 0 4px 14px rgba(234, 179, 8, 0.32);
     }
-    .wish-circle {
-      font-size: 1.7rem;
-      flex-shrink: 0;
-    }
-    .wish-text {
-      font-size: 0.95rem;
-      color: #1e293b;
-      line-height: 1.4;
-    }
+    .wish-circle { font-size: 1.7rem; flex-shrink: 0; }
+    .wish-text { font-size: 0.95rem; color: #1e293b; line-height: 1.4; }
 
-    /* 近期活動專屬卡片樣式 */
+    /* 近期活動卡片排版 */
     .activity-card {
       background: #ffffff;
-      border-radius: 16px;
+      border-radius: 18px;
       border: 1.5px solid var(--border-color);
       overflow: hidden;
       box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
+      max-width: 480px;
+      margin: 0 auto;
       transition: transform 0.2s, box-shadow 0.2s;
     }
     .activity-card:hover {
@@ -777,24 +835,23 @@
     }
     .activity-poster-box {
       width: 100%;
+      height: 280px;
       cursor: pointer;
       position: relative;
       overflow: hidden;
-      background: #0f172a;
+      background: #f8fafc;
       display: flex;
       justify-content: center;
       align-items: center;
     }
     .activity-poster-box img {
-      width: 100%;
-      max-height: 480px;
+      max-width: 100%;
+      max-height: 100%;
       object-fit: contain;
       display: block;
-      transition: transform 0.3s;
+      transition: transform 0.3s ease;
     }
-    .activity-poster-box:hover img {
-      transform: scale(1.02);
-    }
+    .activity-poster-box:hover img { transform: scale(1.02); }
     .activity-hint {
       position: absolute;
       bottom: 10px;
@@ -808,7 +865,6 @@
       backdrop-filter: blur(4px);
     }
 
-    /* 📚 學習特定課題專用樣式 */
     .study-topic-chip {
       display: flex;
       align-items: center;
@@ -857,9 +913,7 @@
       background: #ffffff;
       display: none;
     }
-    .study-topic-chip.selected .study-radio-dot {
-      display: block;
-    }
+    .study-topic-chip.selected .study-radio-dot { display: block; }
 
     .study-item-card {
       background: #ffffff;
@@ -878,7 +932,7 @@
 
   <canvas id="ambientCanvas"></canvas>
 
-  <!-- 作弊警告中斷 Modal -->
+  <!-- 作弊中斷警告視窗 -->
   <div id="violationModal" class="modal-overlay">
     <div class="modal-card" style="max-width: 440px; text-align: center; border-top: 6px solid var(--danger);">
       <div style="font-size: 3.2rem; margin-bottom: 8px;">🚨</div>
@@ -894,7 +948,7 @@
     </div>
   </div>
 
-  <!-- 暱稱與頭像設定 Modal -->
+  <!-- 暱稱頭像 Modal -->
   <div id="profileModal" class="modal-overlay">
     <div class="modal-card">
       <h3 id="modalTitle" style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
@@ -921,7 +975,7 @@
     </div>
   </div>
 
-  <!-- 隨機抽獎揭曉 Modal -->
+  <!-- 抽獎揭曉 Modal -->
   <div id="lotteryResultModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
       <div id="lotteryIcon" style="font-size: 3.5rem; margin-bottom: 8px;">🎁</div>
@@ -939,7 +993,7 @@
     </div>
   </div>
 
-  <!-- 特殊類：心想事成自選 Modal -->
+  <!-- 心想事成 Modal -->
   <div id="wishesModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
       <div style="font-size: 3.5rem; margin-bottom: 8px;">🍀</div>
@@ -971,7 +1025,7 @@
     </div>
   </div>
 
-  <!-- 互動事件發動 Modal -->
+  <!-- 互動事件 Modal -->
   <div id="interactiveActionModal" class="modal-overlay">
     <div class="modal-card">
       <div style="text-align:center; font-size:3rem; margin-bottom:6px;" id="actionIcon">🎯</div>
@@ -997,18 +1051,17 @@
     </div>
   </div>
 
-  <!-- 待觸發事件/狀態通知 Modal -->
+  <!-- 待處理通知 Modal -->
   <div id="pendingNoticeModal" class="modal-overlay">
     <div class="modal-card" style="text-align: center;">
       <div style="font-size: 3.2rem; margin-bottom: 8px;" id="noticeIcon">📬</div>
       <h3 id="noticeTitle" style="font-size: 1.35rem; font-weight: 900; margin-bottom: 8px;"></h3>
       <div id="noticeContent" style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 22px; text-align: left; background: #f8fafc; padding: 16px; border-radius: 14px; border: 1.5px solid #e2e8f0;"></div>
-      
       <div id="noticeBtnArea" style="display:flex; gap:12px;"></div>
     </div>
   </div>
 
-  <!-- 重置個人錯題庫 Modal -->
+  <!-- 重置錯題庫 Modal -->
   <div id="resetMistakeModal" class="modal-overlay">
     <div class="modal-card">
       <h3 style="font-size: 1.35rem; font-weight: 800; color: #0f172a; margin-bottom: 6px;">
@@ -1031,7 +1084,7 @@
     </div>
   </div>
 
-  <!-- ✅ 優化 2：選擇欲研讀之特定課題 Modal (矩陣式單選) -->
+  <!-- 學習特定課題 Modal -->
   <div id="topicSelectModal" class="modal-overlay">
     <div class="modal-card" style="max-width: 620px;">
       <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -1063,7 +1116,7 @@
       <p class="brand-subtitle">自主學習・即時反饋・遊戲互動</p>
     </div>
 
-    <!-- 步驟 0：登入驗證區塊 -->
+    <!-- 步驟 0：登入驗證 -->
     <div id="authView" class="campus-card" style="text-align: center; padding: 40px 20px;">
       <div style="font-size: 3rem; margin-bottom: 16px;">🏫</div>
       <h2 style="font-size: 1.4rem; font-weight: 800; margin-bottom: 8px;">請使用學校 Google 帳號登入</h2>
@@ -1089,14 +1142,10 @@
       </p>
     </div>
 
-    <!-- 步驟 1：客製設定介面 (自定義練習主頁) -->
+    <!-- 步驟 1：客製設定主頁 -->
     <div id="setupView" style="display: none;">
       <div class="campus-card">
-        <div class="user-hud-bar">
-          <button id="btnTeacherPanelShortcut" class="btn-teacher-panel-badge" style="display:none;" onclick="openTeacherControlPanelWindow()" title="開啟教師專用模式控制面板">
-            🎛️ 模式控制面板
-          </button>
-
+        <div class="user-hud-bar" id="userHudBar">
           <div class="hud-pill">
             <div class="hud-avatar-slot" onclick="openProfileModal(false)" title="點選更換頭像與暱稱">
               <img id="hudAvatarImg" src="icons/icon_1.png" alt="Avatar">
@@ -1137,7 +1186,6 @@
           <button id="btnOpenMistakes" class="btn-campus" style="flex: 1; background: linear-gradient(135deg, #475569 0%, #334155 100%); box-shadow: 0 4px 12px rgba(51, 65, 85, 0.25);" onclick="openMistakeBankView()">📖 個人錯題庫</button>
         </div>
 
-        <!-- ✅ 優化 2：主頁最下方「學習特定課題」專屬按鈕 -->
         <div style="margin-top: 14px;">
           <button id="btnStudyTopic" class="btn-campus" style="background: linear-gradient(135deg, var(--study-theme) 0%, var(--study-hover) 100%); box-shadow: 0 4px 14px rgba(13, 148, 136, 0.28);" onclick="openTopicSelectModal()">
             📚 學習特定課題
@@ -1154,7 +1202,7 @@
       </div>
     </div>
 
-    <!-- 步驟 1.5：個人錯題庫重溫頁面 -->
+    <!-- 步驟 1.5：個人錯題庫重溫 -->
     <div id="mistakeBankView" style="display: none;">
       <div class="campus-card">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--border-color); padding-bottom: 14px; margin-bottom: 18px;">
@@ -1175,7 +1223,7 @@
       </div>
     </div>
 
-    <!-- ✅ 優化 2：步驟 1.6：學習特定課題專屬頁面 (題目 + 正解 + 解說) -->
+    <!-- 步驟 1.6：學習特定課題專屬頁面 -->
     <div id="topicStudyView" style="display: none;">
       <div class="campus-card">
         <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--border-color); padding-bottom: 14px; margin-bottom: 18px;">
@@ -1184,7 +1232,7 @@
               <span style="font-size: 1.5rem;">📚</span>
               <h2 id="topicStudyTitle" style="font-size: 1.45rem; font-weight: 800; color: #0f172a;">課題全題研讀</h2>
             </div>
-            <p id="topicStudySubtitle" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">標準答案、完整選項與深度詳解自主學習</p>
+            <p id="topicStudySubtitle" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">標準答案、完整選項、深度詳解與能力指標自主研讀</p>
           </div>
           <span id="topicStudyCountBadge" style="background: #ccfbf1; color: var(--study-hover); font-weight: 800; font-size: 0.88rem; padding: 6px 14px; border-radius: 999px;">共 0 題</span>
         </div>
@@ -1193,7 +1241,6 @@
           <div style="text-align: center; color: var(--text-muted); padding: 40px;">正在讀取課題全量題庫...</div>
         </div>
 
-        <!-- 頁面最下方配置返回按鈕 -->
         <div style="margin-top: 26px;">
           <button class="btn-campus" style="background: linear-gradient(135deg, #475569 0%, #334155 100%);" onclick="closeTopicStudyView()">🔙 返回自定義練習</button>
         </div>
@@ -1245,6 +1292,20 @@
         </div>
       </div>
 
+      <!-- 大尺寸立體雷達圖（獨佔一行、文字防截斷、取消閃爍） -->
+      <div id="radarSection" class="radar-academic-card" style="display: none;">
+        <div class="radar-card-header">
+          <div class="radar-main-title">
+            <span>🎯</span> 測驗能力指標診斷雷達圖
+          </div>
+          <div class="radar-subtitle">全方位學力維度與思維素養即時評估</div>
+        </div>
+
+        <div class="radar-full-container">
+          <canvas id="abilityRadarChartCanvas"></canvas>
+        </div>
+      </div>
+
       <div id="wrongSection">
         <h3 style="font-size: 1.15rem; font-weight: 800; color: #1e293b; margin-bottom: 14px;">🔍 本次練習錯題診斷與詳解</h3>
         <div id="wrongListContainer"></div>
@@ -1285,7 +1346,9 @@
     let cachedCategoryGroups = [];
     let selectedStudyCategory = '';
 
-    /* ================= 1. API 通訊與極速身分校驗 ================= */
+    let radarChartInstance = null;
+
+    /* ================= 1. API 通訊 ================= */
     async function callGasApi(action, data = {}) {
       const response = await fetch(GAS_API_URL, {
         method: 'POST',
@@ -1309,7 +1372,7 @@
 
     async function handleCredentialResponse(response) {
       userAuthToken = response.credential;
-      showLoading(true, '⚡ 極速登入驗證中...');
+      showLoading(true, '⚡ 角色身分驗證中...');
 
       try {
         const res = await callGasApi('getInitData');
@@ -1328,7 +1391,7 @@
         renderPromotionActivities(res.activities || []);
 
         if (currentUserProfile.isTeacher) {
-          document.getElementById('btnTeacherPanelShortcut').style.display = 'inline-flex';
+          injectTeacherPanelButton();
         }
 
         checkMoreTheMerrierOnLogin();
@@ -1343,6 +1406,20 @@
       }
     }
 
+    function injectTeacherPanelButton() {
+      if (document.getElementById('btnTeacherPanelDynamic')) return;
+
+      const btn = document.createElement('button');
+      btn.id = 'btnTeacherPanelDynamic';
+      btn.className = 'btn-teacher-panel-badge';
+      btn.innerHTML = '🎛️ 模式控制面板';
+      btn.title = '開啟教師專用模式控制面板';
+      btn.onclick = openTeacherControlPanelWindow;
+
+      const hudBar = document.getElementById('userHudBar');
+      hudBar.insertBefore(btn, hudBar.firstChild);
+    }
+
     function updateHudUI(profile) {
       document.getElementById('hudNickname').textContent = profile.nickname || '未命名';
       document.getElementById('hudAchievement').textContent = profile.achievement || '';
@@ -1353,13 +1430,15 @@
       document.getElementById('hudAvatarImg').src = `icons/${avatarStyle}.png`;
     }
 
+    /* 檢查並套用多多益善效果 */
     function checkMoreTheMerrierOnLogin() {
       if (currentExamConfig && currentExamConfig.isExamMode) return;
 
+      const slider = document.getElementById('countSlider');
+      const sliderVal = document.getElementById('sliderValue');
+
       if (isMoreTheMerrierActive()) {
         const sender = currentUserProfile.moreIsMerrierSender || '某位神秘同學';
-        const slider = document.getElementById('countSlider');
-        const sliderVal = document.getElementById('sliderValue');
 
         slider.value = 60;
         sliderVal.textContent = '60 題 (🔒 強制鎖定)';
@@ -1374,6 +1453,10 @@
           `🔓 <b>解除方式：</b>在日常練習模式下完整完成 60 題作答並交卷，方可解除此效果！`,
           '我知道了，接受挑戰！'
         );
+      } else {
+        slider.disabled = false;
+        slider.style.pointerEvents = 'auto';
+        sliderVal.textContent = slider.value + ' 題';
       }
     }
 
@@ -1394,7 +1477,7 @@
       if (config.isExamMode) {
         modeInput.value = config.examName;
         modeInput.classList.add('exam-active-mode');
-        modeLabel.innerHTML = '🏫 目前模式 <span style="color:#f97316; font-size:0.85rem; font-weight:800;">(🔒 正式測驗進行中)</span>';
+        modeLabel.innerHTML = `🏫 目前模式 <span style="color:#f97316; font-size:0.85rem; font-weight:800;">(🔒 ${escapeHtml(config.targetClass)} 正式測驗進行中)</span>`;
 
         if (config.questionCount > 0) {
           slider.value = config.questionCount;
@@ -1420,7 +1503,6 @@
       }
     }
 
-    /* ================= 2. 近期活動渲染 ================= */
     function renderPromotionActivities(activities) {
       const section = document.getElementById('recentActivitiesSection');
       const container = document.getElementById('activitiesListContainer');
@@ -1434,178 +1516,217 @@
       activities.forEach(act => {
         const card = document.createElement('div');
         card.className = 'activity-card';
-
-        const titleDiv = document.createElement('div');
-        titleDiv.className = 'activity-title';
-        titleDiv.textContent = act.title;
-
-        const posterBox = document.createElement('div');
-        posterBox.className = 'activity-poster-box';
-        posterBox.title = act.rulesUrl ? '點擊海報檢視章程詳情' : act.title;
-
-        const img = document.createElement('img');
-        img.src = act.posterUrl;
-        img.alt = act.title;
-        img.loading = 'lazy';
-
-        posterBox.appendChild(img);
-
-        if (act.rulesUrl) {
-          const hint = document.createElement('div');
-          hint.className = 'activity-hint';
-          hint.textContent = '🔗 點擊海報開啟章程';
-          posterBox.appendChild(hint);
-
-          posterBox.onclick = () => {
-            window.open(act.rulesUrl, '_blank');
-          };
-        }
-
-        card.appendChild(titleDiv);
-        card.appendChild(posterBox);
+        card.innerHTML = `
+          <div class="activity-title">${escapeHtml(act.title)}</div>
+          <div class="activity-poster-box" title="${act.rulesUrl ? '點擊海報檢視章程詳情' : escapeHtml(act.title)}" ${act.rulesUrl ? `onclick="window.open('${escapeHtml(act.rulesUrl)}', '_blank')"` : ''}>
+            <img src="${escapeHtml(act.posterUrl)}" alt="${escapeHtml(act.title)}" loading="lazy">
+            ${act.rulesUrl ? '<div class="activity-hint">🔗 點擊海報開啟章程</div>' : ''}
+          </div>
+        `;
         container.appendChild(card);
       });
 
       section.style.display = 'block';
     }
 
-    /* ================= 3. 教師專屬：模式控制面板 ================= */
+    /* ================= 2. 教師模式控制面板（修復點擊失靈） ================= */
     function openTeacherControlPanelWindow() {
-      const panelWin = window.open('', '_blank', 'width=980,height=820');
+      if (!currentUserProfile || !currentUserProfile.isTeacher) {
+        alert('⛔ 存取被拒：您沒有教師組別權限！');
+        return;
+      }
+
+      const panelWin = window.open('', '_blank', 'width=1040,height=880');
       if (!panelWin) {
         alert('請允許瀏覽器彈出視窗以檢視「模式控制面板」！');
         return;
       }
-
-      const cfg = currentExamConfig || {};
-      const allCats = cfg.allConfigCategories || [];
-      const lockedCats = cfg.lockedCategories || [];
-      const currentIsOpen = cfg.isExamMode ? 1 : 0;
-      const currentExamName = cfg.examName !== '日常練習' ? cfg.examName : '第1段數學AI能力測驗';
-      const currentQCount = cfg.questionCount > 0 ? cfg.questionCount : 30;
-      const currentMultiplier = cfg.lotteryMultiplier || 1;
 
       const panelHtml = `
 <!DOCTYPE html>
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8">
-  <title>🎛️ AIMathQuest 模式控制面板</title>
+  <title>🎛️ AIMathQuest 多班別模式控制面板</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: #0b0f19; color: #f1f5f9; padding: 28px 24px; min-height: 100vh; }
-    .panel-container { max-width: 860px; margin: 0 auto; background: #111827; border: 1.5px solid #1f2937; border-radius: 20px; padding: 32px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-    .panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #1f2937; padding-bottom: 20px; margin-bottom: 28px; }
-    .panel-title { font-size: 1.6rem; font-weight: 800; color: #38bdf8; letter-spacing: -0.5px; }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; user-select: none; }
+    body { background: #0b0f19; color: #f1f5f9; padding: 24px; min-height: 100vh; }
+    .panel-container { max-width: 980px; margin: 0 auto; background: #111827; border: 1.5px solid #1f2937; border-radius: 20px; padding: 28px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #1f2937; padding-bottom: 18px; margin-bottom: 24px; }
+    .panel-title { font-size: 1.55rem; font-weight: 800; color: #38bdf8; }
     .panel-badge { font-size: 0.8rem; background: #0369a1; color: #e0f2fe; padding: 4px 10px; border-radius: 999px; font-weight: 800; }
-    .form-item { margin-bottom: 26px; }
-    .form-label { display: block; font-size: 0.95rem; font-weight: 700; color: #94a3b8; margin-bottom: 10px; }
-    .ios-switch-box { display: flex; align-items: center; gap: 14px; }
-    .ios-switch { position: relative; display: inline-block; width: 56px; height: 32px; }
+    .form-item { margin-bottom: 24px; }
+    .form-label { display: block; font-size: 0.95rem; font-weight: 700; color: #94a3b8; margin-bottom: 8px; }
+    .input-dark { width: 100%; background: #1e293b; border: 1.5px solid #334155; color: #f8fafc; padding: 10px 14px; border-radius: 10px; font-size: 0.95rem; font-weight: 600; outline: none; }
+    .input-dark:focus { border-color: #38bdf8; }
+    .class-card { background: #1e293b; border: 1.5px solid #334155; border-radius: 16px; padding: 18px; margin-bottom: 16px; position: relative; }
+    .class-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; border-bottom: 1px solid #334155; padding-bottom: 10px; }
+    .class-title { font-size: 1.15rem; font-weight: 800; color: #38bdf8; }
+    .ios-switch { position: relative; display: inline-block; width: 50px; height: 28px; }
     .ios-switch input { opacity: 0; width: 0; height: 0; }
-    .slider-toggle { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #334155; transition: .3s; border-radius: 34px; }
-    .slider-toggle:before { position: absolute; content: ""; height: 24px; width: 24px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+    .slider-toggle { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #475569; transition: .3s; border-radius: 34px; }
+    .slider-toggle:before { position: absolute; content: ""; height: 20px; width: 20px; left: 4px; bottom: 4px; background-color: white; transition: .3s; border-radius: 50%; }
     input:checked + .slider-toggle { background-color: #10b981; }
-    input:checked + .slider-toggle:before { transform: translateX(24px); }
-    .switch-status-text { font-weight: 800; font-size: 1.05rem; color: #cbd5e1; }
-    .input-dark { width: 100%; background: #1e293b; border: 1.5px solid #334155; color: #f8fafc; padding: 12px 16px; border-radius: 12px; font-size: 1rem; font-weight: 600; outline: none; transition: all 0.2s; }
-    .input-dark:focus { border-color: #38bdf8; box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15); }
-    .range-box { display: flex; align-items: center; gap: 18px; }
-    .slider-dark { flex: 1; height: 8px; border-radius: 4px; background: #334155; outline: none; -webkit-appearance: none; }
-    .slider-dark::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; border-radius: 50%; background: #38bdf8; cursor: pointer; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
-    .slider-val-badge { background: #0369a1; color: #ffffff; padding: 6px 16px; border-radius: 10px; font-weight: 800; font-size: 1.1rem; min-width: 70px; text-align: center; }
-    .matrix-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; margin-top: 8px; }
-    .matrix-item { display: flex; align-items: center; gap: 10px; padding: 12px 14px; background: #1e293b; border: 1.5px solid #334155; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: #cbd5e1; transition: all 0.2s; }
-    .matrix-item:hover { border-color: #38bdf8; }
-    .matrix-item.checked { background: rgba(56, 189, 248, 0.12); border-color: #38bdf8; color: #38bdf8; }
-    .matrix-item input { accent-color: #38bdf8; width: 16px; height: 16px; }
-    .btn-submit-panel { width: 100%; margin-top: 32px; padding: 16px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; border: none; border-radius: 14px; font-size: 1.15rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35); transition: all 0.2s; }
-    .btn-submit-panel:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(2, 132, 199, 0.5); }
+    input:checked + .slider-toggle:before { transform: translateX(22px); }
+    .cats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px; margin-top: 10px; }
+    /* 修正後的課題按鈕樣式：直覺、零延遲點擊 */
+    .cat-item { display: flex; align-items: center; justify-content: center; text-align: center; padding: 10px 12px; background: #0f172a; border: 1.5px solid #334155; border-radius: 8px; font-size: 0.88rem; font-weight: 700; color: #cbd5e1; cursor: pointer; transition: all 0.15s ease; }
+    .cat-item:hover { border-color: #38bdf8; background: #1e293b; }
+    .cat-item.checked { border-color: #38bdf8; background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-weight: 900; box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25); }
+    .btn-add-class { background: #334155; color: #38bdf8; border: 1.5px dashed #38bdf8; border-radius: 12px; padding: 12px; font-weight: 800; cursor: pointer; width: 100%; transition: all 0.2s; }
+    .btn-add-class:hover { background: rgba(56, 189, 248, 0.1); }
+    .btn-del-class { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; cursor: pointer; }
+    .btn-submit-panel { width: 100%; margin-top: 24px; padding: 16px; background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); color: #ffffff; border: none; border-radius: 14px; font-size: 1.15rem; font-weight: 800; cursor: pointer; box-shadow: 0 6px 20px rgba(2, 132, 199, 0.35); }
+    .loader-panel { text-align: center; padding: 60px 20px; font-weight: 800; color: #38bdf8; font-size: 1.2rem; }
   </style>
 </head>
 <body>
-  <div class="panel-container">
-    <div class="panel-header">
-      <div class="panel-title">🎛️ AIMathQuest 模式控制面板</div>
-      <div class="panel-badge">教師專屬後台</div>
-    </div>
-
-    <div class="form-item">
-      <label class="form-label">⚙️ 測驗模式切換</label>
-      <div class="ios-switch-box">
-        <label class="ios-switch">
-          <input type="checkbox" id="switchExamMode" ${currentIsOpen ? 'checked' : ''} onchange="updateSwitchText()">
-          <span class="slider-toggle"></span>
-        </label>
-        <span id="switchStatusText" class="switch-status-text">${currentIsOpen ? '🟢 開啟 (1)' : '⚪ 關閉 (0)'}</span>
-      </div>
-    </div>
-
-    <div class="form-item">
-      <label class="form-label" for="txtExamName">📝 測驗名稱</label>
-      <input type="text" id="txtExamName" class="input-dark" value="${escapeHtml(currentExamName)}" placeholder="例如：第一段S1A數學AI測評1">
-    </div>
-
-    <div class="form-item">
-      <label class="form-label">🎯 測驗題目數量</label>
-      <div class="range-box">
-        <input type="range" id="rangeQCount" class="slider-dark" min="10" max="60" step="5" value="${currentQCount}" oninput="document.getElementById('valQCount').textContent = this.value + ' 題'">
-        <div id="valQCount" class="slider-val-badge">${currentQCount} 題</div>
-      </div>
-    </div>
-
-    <div class="form-item">
-      <label class="form-label">📚 考核課題選擇</label>
-      <div class="matrix-grid" id="categoryMatrixBox">
-        ${allCats.map(cat => `
-          <label class="matrix-item ${lockedCats.includes(cat) ? 'checked' : ''}" onclick="toggleMatrixClass(this)">
-            <input type="checkbox" name="chkCat" value="${escapeHtml(cat)}" ${lockedCats.includes(cat) ? 'checked' : ''}>
-            <span>${escapeHtml(cat)}</span>
-          </label>
-        `).join('')}
-      </div>
-    </div>
-
-    <div class="form-item">
-      <label class="form-label" for="numMultiplier">🎁 幸運大抽獎加乘倍率</label>
-      <input type="number" id="numMultiplier" class="input-dark" min="1" max="100" step="1" value="${currentMultiplier}" placeholder="預設：1">
-    </div>
-
-    <button class="btn-submit-panel" onclick="savePanelSettings()">⚡ 立即設置</button>
+  <div class="panel-container" id="panelApp">
+    <div class="loader-panel" id="panelLoader">🔒 安全校驗中...</div>
   </div>
 
   <script>
-    function updateSwitchText() {
-      const isChecked = document.getElementById('switchExamMode').checked;
-      document.getElementById('switchStatusText').textContent = isChecked ? '🟢 開啟 (1)' : '⚪ 關閉 (0)';
+    let panelData = null;
+
+    window.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch("${GAS_API_URL}", {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'getTeacherPanelData', token: "${userAuthToken}" })
+        });
+        const res = await response.json();
+        if (res.status !== 'success') {
+          document.getElementById('panelApp').innerHTML = '<div style="color:#ef4444; text-align:center; padding:50px; font-size:1.3rem; font-weight:800;">⛔ ' + res.message + '</div>';
+          setTimeout(() => window.close(), 3000);
+          return;
+        }
+
+        panelData = res.data;
+        renderPanelUI();
+      } catch (err) {
+        document.getElementById('panelApp').innerHTML = '<div style="color:#ef4444; text-align:center; padding:50px;">連線異常：' + err.message + '</div>';
+      }
+    });
+
+    function renderPanelUI() {
+      const container = document.getElementById('panelApp');
+      container.innerHTML = \`
+        <div class="panel-header">
+          <div class="panel-title">🎛️ 多班別測驗模式控制中心</div>
+          <div class="panel-badge">已通過安全校驗</div>
+        </div>
+
+        <div class="form-item">
+          <label class="form-label">🎁 抽獎加乘倍率</label>
+          <input type="number" id="txtMultiplier" class="input-dark" style="max-width:200px;" min="1" max="100" value="\${panelData.lotteryMultiplier}">
+        </div>
+
+        <div class="form-item">
+          <label class="form-label" style="font-size:1.05rem; color:#f8fafc; margin-bottom:12px;">🏫 各班別獨立測驗配置</label>
+          <div id="classListContainer"></div>
+          <button class="btn-add-class" onclick="addNewClassConfig()">➕ 新增一個受測班別</button>
+        </div>
+
+        <button class="btn-submit-panel" onclick="saveAllPanelSettings()">⚡ 立即同步</button>
+      \`;
+
+      renderClassCards();
     }
 
-    function toggleMatrixClass(label) {
-      setTimeout(() => {
-        const input = label.querySelector('input');
-        label.classList.toggle('checked', input.checked);
-      }, 10);
+    function renderClassCards() {
+      const box = document.getElementById('classListContainer');
+      box.innerHTML = '';
+
+      if (!panelData.classConfigs || panelData.classConfigs.length === 0) {
+        box.innerHTML = '<div style="color:#64748b; margin-bottom:16px;">目前未設定任何班別測驗，全校學生處於日常練習模式。</div>';
+        return;
+      }
+
+      panelData.classConfigs.forEach((cfg, idx) => {
+        const card = document.createElement('div');
+        card.className = 'class-card';
+        card.innerHTML = \`
+          <div class="class-card-header">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span class="class-title">班別 #\${idx + 1}</span>
+              <label class="ios-switch">
+                <input type="checkbox" id="chkOpen_\${idx}" \${cfg.isOpen ? 'checked' : ''} onchange="panelData.classConfigs[\${idx}].isOpen = this.checked">
+                <span class="slider-toggle"></span>
+              </label>
+              <span style="font-size:0.9rem; font-weight:700; color:\${cfg.isOpen ? '#10b981' : '#64748b'};">
+                \${cfg.isOpen ? '🟢 測驗開啟 (1)' : '⚪ 關閉 (0)'}
+              </span>
+            </div>
+            <button class="btn-del-class" onclick="deleteClassConfig(\${idx})">刪除班別</button>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; margin-bottom:12px;">
+            <div>
+              <label class="form-label">指定班別 (例如 S1A)</label>
+              <input type="text" class="input-dark" value="\${cfg.className || ''}" placeholder="如 S1A" oninput="panelData.classConfigs[\${idx}].className = this.value.toUpperCase()">
+            </div>
+            <div>
+              <label class="form-label">測驗名稱</label>
+              <input type="text" class="input-dark" value="\${cfg.examName || ''}" placeholder="如 第一段AI測評" oninput="panelData.classConfigs[\${idx}].examName = this.value">
+            </div>
+            <div>
+              <label class="form-label">題目數量</label>
+              <input type="number" class="input-dark" min="10" max="60" step="5" value="\${cfg.questionCount || 30}" oninput="panelData.classConfigs[\${idx}].questionCount = parseInt(this.value, 10)">
+            </div>
+          </div>
+
+          <label class="form-label">📚 指定鎖定課題</label>
+          <div class="cats-grid">
+            \${panelData.allCategories.map(cat => {
+              const isChecked = (cfg.selectedCategories || []).includes(cat);
+              const escapedCat = cat.replace(/'/g, "\\\\'");
+              return \`
+                <div class="cat-item \${isChecked ? 'checked' : ''}" onclick="toggleCatSelection(\${idx}, '\${escapedCat}', this)">
+                  \${cat}
+                </div>
+              \`;
+            }).join('')}
+          </div>
+        \`;
+        box.appendChild(card);
+      });
     }
 
-    async function savePanelSettings() {
-      const isOpen = document.getElementById('switchExamMode').checked;
-      const examName = document.getElementById('txtExamName').value.trim();
-      const questionCount = parseInt(document.getElementById('rangeQCount').value, 10);
-      const lotteryMultiplier = parseFloat(document.getElementById('numMultiplier').value) || 1;
-      
-      const checkedBoxes = Array.from(document.querySelectorAll('input[name="chkCat"]:checked')).map(cb => cb.value);
-
-      if (isOpen && !examName) {
-        alert('開啟測驗模式時必須輸入測驗名稱！');
-        return;
+    /* 修復：純粹、直接的同步點選事件，不再有任何標籤雙重觸發與延遲 bug */
+    function toggleCatSelection(classIdx, catName, elem) {
+      const cfg = panelData.classConfigs[classIdx];
+      if (!cfg.selectedCategories) cfg.selectedCategories = [];
+      const pos = cfg.selectedCategories.indexOf(catName);
+      if (pos === -1) {
+        cfg.selectedCategories.push(catName);
+        elem.classList.add('checked');
+      } else {
+        cfg.selectedCategories.splice(pos, 1);
+        elem.classList.remove('checked');
       }
-      if (isOpen && checkedBoxes.length === 0) {
-        alert('請至少勾選一個考核課題！');
-        return;
-      }
+    }
 
+    function addNewClassConfig() {
+      panelData.classConfigs.push({
+        isOpen: true,
+        className: 'S1A',
+        examName: '數學AI單元測驗',
+        questionCount: 30,
+        selectedCategories: panelData.allCategories.slice(0, 1)
+      });
+      renderClassCards();
+    }
+
+    function deleteClassConfig(idx) {
+      panelData.classConfigs.splice(idx, 1);
+      renderClassCards();
+    }
+
+    async function saveAllPanelSettings() {
+      const multiplier = parseFloat(document.getElementById('txtMultiplier').value) || 1;
       const btn = document.querySelector('.btn-submit-panel');
-      btn.textContent = '⏳ 正在同步試算表...';
+      btn.textContent = '⏳ 正在同步...';
       btn.disabled = true;
 
       try {
@@ -1616,25 +1737,22 @@
             action: 'updateCustomModeConfig',
             token: "${userAuthToken}",
             data: {
-              isOpen: isOpen,
-              examName: examName,
-              questionCount: questionCount,
-              selectedCategories: checkedBoxes,
-              lotteryMultiplier: lotteryMultiplier
+              lotteryMultiplier: multiplier,
+              classConfigs: panelData.classConfigs
             }
           })
         });
         const res = await response.json();
         if (res.status === 'success') {
-          alert('🎉 成功！' + res.message);
+          alert('🎉 ' + res.message);
           if (window.opener) window.opener.location.reload();
         } else {
-          alert('設定失敗：' + res.message);
+          alert('儲存失敗：' + res.message);
         }
-      } catch (err) {
-        alert('傳輸失敗：' + err.message);
+      } catch (e) {
+        alert('網路傳輸失敗：' + e.message);
       } finally {
-        btn.textContent = '⚡ 立即設置';
+        btn.textContent = '⚡ 立即同步';
         btn.disabled = false;
       }
     }
@@ -1648,7 +1766,7 @@
       panelWin.document.close();
     }
 
-    /* ================= 4. 個人檔案設定 ================= */
+    /* ================= 3. 個人檔案設定 ================= */
     function openProfileModal(isMandatory = false) {
       const modal = document.getElementById('profileModal');
       const cancelBtn = document.getElementById('btnCancelProfile');
@@ -1728,7 +1846,7 @@
       }
     }
 
-    /* ================= 5. 防作弊監控 ================= */
+    /* ================= 4. 防作弊即時記錄 ================= */
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && isQuizActive && !isViolationModalOpen) {
         recordViolation('切換瀏覽器分頁或視窗最小化');
@@ -1745,18 +1863,31 @@
       isViolationModalOpen = true;
       violationCount++;
       const timeStr = new Date().toLocaleTimeString();
-      violationLogs.push(`[${timeStr}] ${reason}`);
+      const logText = `[${timeStr}] ${reason}`;
+      violationLogs.push(logText);
+
+      logInstantViolationToSheet(logText);
 
       const msgBox = document.getElementById('violationModalMsg');
       msgBox.innerHTML = `
         ⚠️ <b>異常操作：</b>${reason}<br>
         ⚠️ <b>累計違規：</b>第 <b style="color:#b91c1c; font-size:1.15rem;">${violationCount}</b> 次<br>
         <span style="font-size:0.85rem; color:#64748b; display:inline-block; margin-top:8px;">
-          請注意：所有切換離開行為已同步記錄於後端考室伺服器，嚴禁作弊！
+          請注意：違規行為已即時登記於考室日誌當中，切勿離開作答畫面！
         </span>
       `;
 
       document.getElementById('violationModal').style.display = 'flex';
+    }
+
+    function logInstantViolationToSheet(logText) {
+      const mode = document.getElementById('examRoomInput').value.trim() || '日常練習';
+      callGasApi('logInstantViolation', {
+        mode: mode,
+        violationReason: logText
+      }).catch(err => {
+        console.warn('即時考室記錄同步失敗:', err);
+      });
     }
 
     function dismissViolationModal() {
@@ -1764,7 +1895,7 @@
       setTimeout(() => { isViolationModalOpen = false; }, 350);
     }
 
-    /* ================= 6. 題庫選擇與鎖定機制 ================= */
+    /* ================= 5. 題庫與抽題 ================= */
     window.addEventListener('DOMContentLoaded', () => {
       const slider = document.getElementById('countSlider');
       const sliderVal = document.getElementById('sliderValue');
@@ -1904,7 +2035,7 @@
         totalCount = 60;
       }
 
-      showLoading(true, '⚡ 正在為您智慧配置考卷中...');
+      showLoading(true, '⚡ 智慧配置考卷中...');
 
       try {
         const res = await callGasApi('generateQuiz', { selectedCategories: selectedCats, totalCount: totalCount });
@@ -1951,7 +2082,10 @@
 
         card.innerHTML = `
           <div class="q-meta">
-            <span class="q-category-tag">📂 ${escapeHtml(q.category)}</span>
+            <div class="q-tags-group">
+              <span class="q-category-tag">📂 ${escapeHtml(q.category)}</span>
+              <span class="q-ability-tag">🎯 ${escapeHtml(q.ability || '綜合素養')}</span>
+            </div>
             <span class="q-counter">第 ${qIndex + 1} 題 / 共 ${questions.length} 題</span>
           </div>
           <div class="q-content">${formatPythonQuestion(q.question)}</div>
@@ -1983,7 +2117,7 @@
       document.getElementById('energyBarFill').style.width = `${percent}%`;
     }
 
-    /* ================= 7. 個人錯題庫重溫 ================= */
+    /* ================= 6. 個人錯題庫重溫 ================= */
     async function openMistakeBankView() {
       document.getElementById('setupView').style.display = 'none';
       document.getElementById('topicStudyView').style.display = 'none';
@@ -2006,6 +2140,7 @@
       document.getElementById('mistakeBankView').style.display = 'none';
       document.getElementById('setupView').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      checkMoreTheMerrierOnLogin();
     }
 
     function renderMistakeCards(data) {
@@ -2050,17 +2185,15 @@
         });
         optionsHtml += '</div>';
 
+        // 嚴格消除標籤與變數間的多餘空格，防止 pre-wrap 導致縮排
         card.innerHTML = `
-          <div style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 6px;">
-            [${escapeHtml(q.category)}] 題號：${escapeHtml(q.id)}
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem;">[${escapeHtml(q.category)}] 題號：${escapeHtml(q.id)}</span>
+            <span class="q-ability-tag">🎯 ${escapeHtml(q.ability || '綜合素養')}</span>
           </div>
-          <div class="q-content" style="font-size: 1.05rem; margin-bottom: 8px;">
-            ${formatPythonQuestion(q.question)}
-          </div>
+          <div class="q-content" style="font-size: 1.05rem; margin-bottom: 8px;">${formatPythonQuestion(q.question)}</div>
           ${optionsHtml}
-          <div class="explanation-container">
-            💡 <b>題目解析：</b><br>${escapeHtml(q.explanation)}
-          </div>
+          <div class="explanation-container">💡 <b>題目解析：</b><br>${escapeHtml((q.explanation || '暫無解析說明').trim())}</div>
         `;
 
         container.appendChild(card);
@@ -2135,13 +2268,12 @@
       }
     }
 
-    /* ================= 8. 學習特定課題 (單選矩陣 + 題目正解詳解研讀) ================= */
+    /* ================= 7. 學習特定課題 ================= */
     function openTopicSelectModal() {
       const container = document.getElementById('studyTopicMatrixContainer');
       container.innerHTML = '';
       selectedStudyCategory = '';
 
-      // 匯總所有可用課題清單
       const allAvailableCats = [];
       if (cachedCategoryGroups && cachedCategoryGroups.length > 0) {
         cachedCategoryGroups.forEach(grp => {
@@ -2158,7 +2290,6 @@
         return;
       }
 
-      // 預設選中首個課題
       selectedStudyCategory = allAvailableCats[0];
 
       allAvailableCats.forEach(catName => {
@@ -2194,7 +2325,7 @@
       }
 
       closeTopicSelectModal();
-      showLoading(true, `📚 正在載入【${selectedStudyCategory}】全部題目與解答解析...`);
+      showLoading(true, `📚 正在載入【${selectedStudyCategory}】題目與解答詳解...`);
 
       try {
         const res = await callGasApi('getTopicStudyData', { category: selectedStudyCategory });
@@ -2252,20 +2383,20 @@
           });
           optionsHtml += '</div>';
 
+          // 嚴格消除標籤與變數間的多餘空格，防止 pre-wrap 導致縮排
           card.innerHTML = `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
               <span style="font-weight: 800; color: var(--study-theme); font-size: 0.95rem;">
                 第 ${idx + 1} 題（編號：${escapeHtml(q.id)}）
               </span>
-              <span class="q-category-tag" style="background: #ccfbf1; color: var(--study-hover);">📂 ${escapeHtml(q.category)}</span>
+              <div style="display:flex; gap:6px;">
+                <span class="q-category-tag" style="background: #ccfbf1; color: var(--study-hover);">📂 ${escapeHtml(q.category)}</span>
+                <span class="q-ability-tag">🎯 ${escapeHtml(q.ability || '綜合素養')}</span>
+              </div>
             </div>
-            <div class="q-content" style="font-size: 1.08rem; margin-bottom: 12px;">
-              ${formatPythonQuestion(q.question)}
-            </div>
+            <div class="q-content" style="font-size: 1.08rem; margin-bottom: 12px;">${formatPythonQuestion(q.question)}</div>
             ${optionsHtml}
-            <div class="explanation-container" style="background: #f0fdfa; border-left-color: var(--study-theme); color: #134e4a; margin-top: 14px;">
-              💡 <b>標準解析說明：</b><br>${escapeHtml(q.explanation)}
-            </div>
+            <div class="explanation-container" style="background: #f0fdfa; border-left-color: var(--study-theme); color: #134e4a; margin-top: 14px;">💡 <b>標準解析說明：</b><br>${escapeHtml((q.explanation || '暫無解析說明').trim())}</div>
           `;
 
           container.appendChild(card);
@@ -2280,9 +2411,10 @@
       document.getElementById('topicStudyView').style.display = 'none';
       document.getElementById('setupView').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
+      checkMoreTheMerrierOnLogin();
     }
 
-    /* ================= 9. 交卷、抽獎與事件判定 ================= */
+    /* ================= 8. 交卷、評分與雷達圖繪製 ================= */
     async function handleSubmitQuizWithRetry() {
       const total = currentQuizData.length;
       const answeredCount = Object.keys(userAnswers).length;
@@ -2301,7 +2433,7 @@
       }
 
       isQuizActive = false;
-      showLoading(true, '📊 系統正在安全評分，並進行幸運大抽獎...');
+      showLoading(true, '📊 系統評分中，並進行幸運大抽獎...');
 
       const payload = {
         examRoom: document.getElementById('examRoomInput').value.trim() || '日常練習',
@@ -2379,6 +2511,9 @@
         titleElem.textContent = '💪 還有進步空間，繼續加油！';
       }
 
+      // 繪製大尺寸雷達圖（無閃爍、文字完整、獨佔一行）
+      renderAbilityRadarChart(result.abilityRadarData);
+
       const wrongContainer = document.getElementById('wrongListContainer');
       wrongContainer.innerHTML = '';
 
@@ -2421,21 +2556,157 @@
           });
           optionsReviewHtml += '</div>';
 
+          // 嚴格消除標籤與變數間的多餘空格，防止 pre-wrap 導致縮排
           card.innerHTML = `
-            <div style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 6px;">
-              [${escapeHtml(item.category)}] 題號：${escapeHtml(item.id)}
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+              <span style="font-weight: 700; color: var(--text-muted); font-size: 0.85rem;">[${escapeHtml(item.category)}] 題號：${escapeHtml(item.id)}</span>
+              <span class="q-ability-tag">🎯 ${escapeHtml(item.ability || '綜合素養')}</span>
             </div>
-            <div class="q-content" style="font-size: 1.05rem; margin-bottom: 8px;">
-              ${formatPythonQuestion(item.question)}
-            </div>
+            <div class="q-content" style="font-size: 1.05rem; margin-bottom: 8px;">${formatPythonQuestion(item.question)}</div>
             ${optionsReviewHtml}
-            <div class="explanation-container">
-              💡 <b>題目解析：</b><br>${escapeHtml(item.explanation)}
-            </div>
+            <div class="explanation-container">💡 <b>題目解析：</b><br>${escapeHtml((item.explanation || '暫無解析說明').trim())}</div>
           `;
           wrongContainer.appendChild(card);
         });
       }
+    }
+
+    /**
+     * 繪製大尺寸、獨立一行、防溢出、取消閃爍之能力雷達圖
+     */
+    function renderAbilityRadarChart(abilityData) {
+      const radarSection = document.getElementById('radarSection');
+      if (!abilityData || Object.keys(abilityData).length === 0) {
+        radarSection.style.display = 'none';
+        return;
+      }
+
+      radarSection.style.display = 'block';
+
+      const labels = Object.keys(abilityData);
+      const scores = labels.map(l => abilityData[l].rate);
+
+      const ctx = document.getElementById('abilityRadarChartCanvas').getContext('2d');
+      if (radarChartInstance) {
+        radarChartInstance.destroy();
+      }
+
+      const gradientFill = ctx.createRadialGradient(290, 290, 20, 290, 290, 280);
+      gradientFill.addColorStop(0, 'rgba(14, 165, 233, 0.65)');
+      gradientFill.addColorStop(0.6, 'rgba(37, 99, 235, 0.35)');
+      gradientFill.addColorStop(1, 'rgba(13, 148, 136, 0.12)');
+
+      radarChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: '能力掌握得分率 (%)',
+            data: scores,
+            backgroundColor: gradientFill,
+            borderColor: '#0284c7',
+            borderWidth: 3,
+            borderJoinStyle: 'round',
+            // 修正：pointRadius 與 pointHoverRadius 保持一致，徹底杜絕滑鼠 hover 震顫閃爍
+            pointBackgroundColor: '#ffffff',
+            pointBorderColor: '#0284c7',
+            pointBorderWidth: 2.5,
+            pointRadius: 5,
+            pointHoverRadius: 5,
+            pointHoverBorderWidth: 2.5,
+            pointHoverBackgroundColor: '#0284c7',
+            pointHoverBorderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          // 關閉點 hover 狀態下的動畫突變
+          transitions: {
+            active: {
+              animation: { duration: 0 }
+            }
+          },
+          interaction: {
+            mode: 'nearest',
+            intersect: false
+          },
+          animation: {
+            duration: 1200,
+            easing: 'easeOutQuart'
+          },
+          // 修正：加入外圍安全邊距，確保文字不會頂到邊緣
+          layout: {
+            padding: {
+              top: 25,
+              bottom: 25,
+              left: 45,
+              right: 45
+            }
+          },
+          scales: {
+            r: {
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 20,
+                color: '#94a3b8',
+                backdropColor: 'transparent',
+                font: { size: 11, weight: '700' },
+                callback: function(value) { return value + '%'; }
+              },
+              grid: {
+                color: 'rgba(203, 213, 225, 0.8)',
+                lineWidth: 1.4
+              },
+              angleLines: {
+                color: 'rgba(148, 163, 184, 0.6)',
+                lineWidth: 1.5
+              },
+              pointLabels: {
+                font: {
+                  size: 12,
+                  weight: '800',
+                  family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto'
+                },
+                color: '#0f172a',
+                padding: 12,
+                // 修正：超過 7 個字的長文字自動分行，避免橫向文字超出版面被截斷
+                callback: function(label) {
+                  if (typeof label === 'string' && label.length > 7) {
+                    return [label.slice(0, 7), label.slice(7)];
+                  }
+                  return label;
+                }
+              }
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: 'rgba(15, 23, 42, 0.92)',
+              titleFont: { size: 14, weight: '900' },
+              bodyFont: { size: 13, weight: '700' },
+              padding: 12,
+              cornerRadius: 10,
+              displayColors: false,
+              callbacks: {
+                title: function(items) {
+                  return '🎯 ' + items[0].label;
+                },
+                label: function(context) {
+                  const lbl = context.label || '';
+                  const itm = abilityData[lbl];
+                  return [
+                    `📊 得分率：${context.raw}%`,
+                    `📝 答對表現：${itm ? itm.correct + ' / ' + itm.total + ' 題' : ''}`
+                  ];
+                }
+              }
+            }
+          }
+        }
+      });
     }
 
     function startPostSubmissionPipeline(result) {
@@ -2457,7 +2728,7 @@
           type: 'meteorShower',
           title: '🌠 事件獎勵：流星雨下的祝福',
           icon: '🌠',
-          content: `流星雨下，您已獲得來自【<b>${escapeHtml(p.meteorShower.sender || '某同學')}</b>】的祝福！<br>你們都將在下一次的答題中獲得<b>雙倍經驗（答對與課題表現 x2 入庫）</b>！`
+          content: `流星雨下，您已獲得來自【<b>${escapeHtml(p.meteorShower.sender || '神秘同學')}</b>】的祝福！<br>你們都將在下一次的答題中獲得<b>雙倍經驗（答對與課題表現 x2 入庫）</b>！`
         });
       }
       if (p.megaphone) {
@@ -2465,7 +2736,7 @@
           type: 'megaphone',
           title: '💬 道具：眾裡尋他傳聲筒',
           icon: '💬',
-          content: `來自【<b>${escapeHtml(p.megaphone.sender || '某同學')}</b>】傳給您一段話：<br><br>` +
+          content: `來自【<b>${escapeHtml(p.megaphone.sender || '神秘同學')}</b>】傳給您一段話：<br><br>` +
                    `<div style="font-style:italic; color:#0f172a; font-weight:800; font-size:1.05rem;">「${escapeHtml(p.megaphone.message)}」</div><br>` +
                    `您已獲得<b>「驀然回首傳聲筒」</b>，是否要回應對方一段訊息？`,
           canReply: true,
@@ -2478,7 +2749,7 @@
           type: 'lookback',
           title: '💬 回聲：驀然回首傳聲筒',
           icon: '💬',
-          content: `【<b>${escapeHtml(p.lookback.sender || '某同學')}</b>】回應了您的傳聲：<br><br>` +
+          content: `【<b>${escapeHtml(p.lookback.sender || '神秘同學')}</b>】回應了您的傳聲：<br><br>` +
                    `<div style="font-style:italic; color:#0f172a; font-weight:800; font-size:1.05rem;">「${escapeHtml(p.lookback.message)}」</div>`
         });
       }
@@ -2601,7 +2872,7 @@
       if (type === 'meteor') {
         icon.textContent = '🌠';
         title.textContent = '事件：流星雨下的祝福';
-        desc.textContent = '說出一個人的姓名，你們都可在下一次答題中獲得雙雙倍經驗！';
+        desc.textContent = '說出一個人的姓名，你們都可在下一次答題中獲得雙倍經驗！';
         msgGroup.style.display = 'none';
         btn.textContent = '祝福！';
       } else if (type === 'megaphone') {
@@ -2613,7 +2884,7 @@
       } else if (type === 'more_the_merrier') {
         icon.textContent = '🤪';
         title.textContent = '發動技能：多多益善';
-        desc.textContent = '說出一個人的姓名，對方下一次練習必須強制挑戰 60 道題目！';
+        desc.textContent = '說出一個人的姓名，鼓勵對方下一次練習必須體驗挑戰 60 道題目！';
         msgGroup.style.display = 'none';
         btn.textContent = '益你！';
       } else if (type === 'lookback') {
@@ -2732,17 +3003,8 @@
       document.getElementById('setupView').style.display = 'block';
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
-      const slider = document.getElementById('countSlider');
-      const sliderVal = document.getElementById('sliderValue');
-      if (isMoreTheMerrierActive()) {
-        slider.value = 60;
-        sliderVal.textContent = '60 題 (🔒 強制鎖定)';
-        slider.disabled = true;
-        slider.style.pointerEvents = 'none';
-      } else if (!currentExamConfig || !currentExamConfig.isExamMode) {
-        slider.disabled = false;
-        slider.style.pointerEvents = 'auto';
-      }
+      // 返回主頁時強制檢查多多益善狀態
+      checkMoreTheMerrierOnLogin();
     }
 
     function fireCampusConfetti() {
@@ -2798,9 +3060,10 @@
         .replace(/'/g, "&#039;");
     }
 
+    /* 智慧排版：自動清理前置與後置空格，保證頂格對齊 */
     function formatPythonQuestion(rawText) {
       if (!rawText) return '';
-      var text = String(rawText);
+      var text = String(rawText).trim();
 
       if (text.indexOf(';') !== -1 && (text.indexOf('print') !== -1 || text.indexOf('=') !== -1 || text.indexOf('while') !== -1 || text.indexOf('for') !== -1 || text.indexOf('pass') !== -1)) {
         text = text.replace(/;\s*/g, '\n');
